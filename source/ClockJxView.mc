@@ -179,17 +179,19 @@ class ClockJxView extends Ui.WatchFace {
     {
         // Map out the coordinates of the watch hand
 		var start;
+        var dev_height = dc.getHeight();		
+        var dev_width = dc.getWidth();
 		if (draw_type == 2) {
 			// hour marks
-			start = 90;
+			start = dev_height / 2 - length - 4;
+			length = start + length;
 		} else {
 			// minute and hours hands
 			start = 0;
 		}
-        var coords = [ [-(width/2),-start], [-(width/2), -length], [width/2, -length], [width/2, -start] ];
-        var result = new [4];
-        var dev_width = dc.getWidth();
-        var dev_height = dc.getHeight();
+        var coords = [];
+        var ncoords;
+        var result = [];
         var centerX = dev_width / 2;
         var centerY = dev_height / 2;
         var cos = Math.cos(angle);
@@ -197,8 +199,19 @@ class ClockJxView extends Ui.WatchFace {
         var endX = centerX - (-length * sin);
         var endY = centerY + (-length * cos);
 
+		if (draw_type == 2) {
+        	coords = [ [-(width/2),-start], [-(width/2), -length], [width/2, -length], [width/2, -start] ];
+        	result = new [4];
+        	ncoords = 4;
+        } else {
+        	coords = [ [-(width/2),-start], [-(width/2), -length], [0, -length-width-1], 
+        		  	   [width/2, -length], [width/2, -start] ];
+        	result = new [5];
+        	ncoords = 5;
+        }
+
         // Transform the coordinates
-        for (var i = 0; i < 4; i += 1)
+        for (var i = 0; i < ncoords; i += 1)
         {
             var x = (coords[i][0] * cos) - (coords[i][1] * sin);
             var y = (coords[i][0] * sin) + (coords[i][1] * cos);
@@ -219,15 +232,15 @@ class ClockJxView extends Ui.WatchFace {
        		dc.drawLine(centerX, centerY, endX, endY);
        		dc.setColor(fgcol, Gfx.COLOR_TRANSPARENT);
        	}
-       	if (draw_type != 2) {
-       		// minutes or hours hand
-        	dc.fillCircle(endX, endY, width / 2);
-        }
+       	//if (draw_type != 2) {
+       	//	// minutes or hours hand
+        //	dc.fillCircle(endX, endY, width / 2);
+        //}
     }
 
     //! Draw the hash mark symbols on the watch
     //! @param dc Device context
-    function drawHashMarks(dc)
+    function drawHashMarks(dc, length, width)
     {    		
         for (var i = 0; i < 12; i += 1)
         {
@@ -236,7 +249,7 @@ class ClockJxView extends Ui.WatchFace {
         		hour = i * 60;
         		hour = hour / (12 * 60.0);
         		hour = hour * Math.PI * 2;
-        		drawHand(dc, hour, 105, 4, 2, fgcolor, bgcolor);
+        		drawHand(dc, hour, length, width, 2, fgcolor, bgcolor);
         	}
         }
     }
@@ -307,7 +320,7 @@ class ClockJxView extends Ui.WatchFace {
 	        	}
 	        	//dc.drawText(width-5,height/2-15,font,"15", Gfx.TEXT_JUSTIFY_RIGHT);
 	        	dc.drawText(width/2,height-dim,font,"18", Gfx.TEXT_JUSTIFY_CENTER);
-	        	dc.drawText(5,(height/2)-(dim/2)-5,font,"21",Gfx.TEXT_JUSTIFY_LEFT);
+	        	dc.drawText(width/2-height/2+4,(height/2)-(dim/2)-4,font,"21",Gfx.TEXT_JUSTIFY_LEFT);
 	        } else {
 	        	if (Battery >= battery_limit2) {
 					dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
@@ -322,7 +335,7 @@ class ClockJxView extends Ui.WatchFace {
 	        	//dc.drawText(width/2,height-35,font,"6", Gfx.TEXT_JUSTIFY_CENTER);
 	        	dc.drawText(width/2,height-dim,font,"6", Gfx.TEXT_JUSTIFY_CENTER);
 				dim = dc.getFontHeight(font);        	
-	        	dc.drawText(5,(height/2)-(dim/2)-5,font,"9",Gfx.TEXT_JUSTIFY_LEFT);
+	        	dc.drawText(width/2-height/2+4,(height/2)-(dim/2)-4,font,"9",Gfx.TEXT_JUSTIFY_LEFT);
 	        }
 	 	}
 
@@ -333,43 +346,102 @@ class ClockJxView extends Ui.WatchFace {
 
 		pos_dualtime = width / 2;
 		justify_dualtime = Gfx.TEXT_JUSTIFY_CENTER;
-				    	
+		
+		var fix = 0;
+		
 		// positions of each element
+		// * = optional
+		// dt = dualtime
 		if (screen_shape == Sys.SCREEN_SHAPE_ROUND) {
 			// Round clock
 			if (digital_clock) {
 				//	digital clock
+				// 		altitude*
+				//		date
+				//		TIME
+				// 		dualtime*
+				//		steps*
+				//		battery
+				var extra_fix = 3;
+				if (!mountain_mode) {
+					fix = dim/2;
+				}
 				base_altitude = dim + 1;
-				base_date = 2 * dim + 2;
-				base_dualtime = height - 3 * dim - 3 - 3;				
-				base_steps = height - 2 * dim - 2 - 3;
-				base_battery = height - dim - 1 - 3;
+				base_date = 2 * dim + 2 - fix;
+				// TIME
+				fix = 0;			
+				if (!dualtime || !steps) {
+					fix = dim/2;
+				}
+				base_dualtime = height - 3 * dim - 3 + fix - extra_fix;				
+				base_steps = height - 2 * dim - 2 - fix - extra_fix;
+				base_battery = height - dim - 1 - fix - extra_fix;
 			} else {
 				//	analog clock
-				base_dualtime = dim/2 + dim + 1;
-				base_altitude = dim/2 + 2 * dim + 2;
-				base_date = center + dim/2;				
+				// 		dualtime*
+				//		altitude*
+				//		CENTER		date
+				//		steps*
+				//		battery
+				if (!dualtime || !mountain_mode) {
+					fix = dim/2;
+				}
+				base_dualtime = dim/2 + dim + 1 + fix;
+				base_altitude = dim/2 + 2 * dim + 2 - fix;
+				// CENTER
+				fix = 0;
+				base_date = center + dim/2;
+				fix = 0;
+				if (!steps) {
+					fix = dim/2;
+				}				
 				base_steps = height - dim/2 - 3 * dim - 3;
-				base_battery = height - dim/2 - 2 * dim - 2;
+				base_battery = height - dim/2 - 2 * dim - 2 - fix;
 			}
 		} else {
 			// Square clock
 			if (digital_clock) {
 				//	digital clock
+				// 		altitude*
+				//		date
+				//		TIME
+				//		steps*
+				//	dt*	battery
+				if (!mountain_mode) {
+					fix = dim/2;
+				}
 				base_altitude = 1;
-				base_date = dim + 2;
+				base_date = dim + 2 - fix;
+				// TIME
+				fix = 0;
+				if (!steps && !dualtime) {
+					fix = dim/2;
+				}
 				base_steps = height - 2 * dim - 2;
-				base_battery = height - dim - 1;				
+				base_battery = height - dim - 1 - fix;				
 				base_dualtime = height - dim - 1;	// lower left corner
 				pos_dualtime = 1;		
 				justify_dualtime = Gfx.TEXT_JUSTIFY_LEFT;		
 			} else {
 				//	analog clock
-				base_dualtime = dim + 1;
-				base_altitude = 2 * dim + 2;
-				base_date = center + dim/2;				
+				// 		dualtime*
+				//		altitude*
+				//		CENTER		date
+				//		steps*
+				//		battery
+				if (!dualtime || !mountain_mode) {
+					fix = dim/2;
+				}
+				base_dualtime = dim + 1 + fix;
+				base_altitude = 2 * dim + 2 - fix;
+				// CENTER
+				fix = 0;
+				base_date = center + dim/2;
+				if (!steps) {
+					fix = dim/2;
+				}
 				base_steps = height - 3 * dim - 3;
-				base_battery = height - 2 * dim - 2;
+				base_battery = height - 2 * dim - 2 - fix;
 			}
 		}
     	
@@ -438,7 +510,7 @@ class ClockJxView extends Ui.WatchFace {
         if (digital_clock) {
         	dc.drawText(width/2,base_date,Gfx.FONT_TINY, dateStr, Gfx.TEXT_JUSTIFY_CENTER);
         } else {
-	        dc.drawText(width-5,(height/2)-(dim/2),Gfx.FONT_TINY, dateStr, Gfx.TEXT_JUSTIFY_RIGHT);
+	        dc.drawText(width/2 + height/2 - 4,(height/2)-(dim/2),Gfx.FONT_TINY, dateStr, Gfx.TEXT_JUSTIFY_RIGHT);
 	  	}
 	  	
 		// Draw dual time
@@ -510,11 +582,7 @@ class ClockJxView extends Ui.WatchFace {
 
         // Draw battery
 		var battery_bgcolor;
-		if (bgcolor == Gfx.COLOR_WHITE) {
-			battery_bgcolor = bgcolor;
-		} else {
-			battery_bgcolor = Gfx.COLOR_BLACK;
-		}
+		battery_bgcolor = Gfx.COLOR_BLACK;
 		if (Battery >= battery_limit1) { 
 			dc.setColor(Gfx.COLOR_GREEN, battery_bgcolor);
 		} else if (Battery >= battery_limit2) {
@@ -561,17 +629,15 @@ class ClockJxView extends Ui.WatchFace {
         	var hour_hand_length;
 			var min_hand_length;        
         	var hour_hand_width = 9;
-			var min_hand_width = 6;        
+			var min_hand_width = 7;        
         
             dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
-	        min_hand_length = height/2 - analog_num_dim - 1;
-	        if (screen_shape == Sys.SCREEN_SHAPE_ROUND) {
-				hour_hand_length = min_hand_length * 65 / 100;
-				// Draw the hash marks
-	        	drawHashMarks(dc);
-			} else {
-				hour_hand_length = min_hand_length * 2 / 3;
-			}
+	        
+	        var hash_len = analog_num_dim / 2;
+	        min_hand_length = height/2 - hash_len - 4 - 1;
+			hour_hand_length = min_hand_length * 65 / 100;
+			// Draw the hash marks
+	        drawHashMarks(dc, hash_len, 4);
 	        	       
 	        // Draw the hour. Convert it to minutes and
 	        // compute the angle.

@@ -7,7 +7,7 @@
     <string id="ForegroundColorTitle">Foreground Color</string>
     <string id="BackgroundImageTitle">Background Image</string>    
     <string id="Use24hFormatTitle">24 Hour Time at PM</string>
-    <string id="MountainModeTitle">Mountain mode</string>    
+    <string id="MountainModeTitle">Altitude</string>    
     <string id="DigitalClockTitle">Digital clock</string>
     <string id="StepsTitle">Steps</string>
     <string id="UseBackgroundColorWithImageTitle">Background color with image</string>
