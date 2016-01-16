@@ -7,6 +7,9 @@
     <bitmap id="bgimg5" filename="images/103-0378_IMG.jpg" />
     <bitmap id="bgimg6" filename="images/IMG_8068_edited-2.jpg" />        
     <bitmap id="bgimg7" filename="images/IMG_0959.jpg" />
+       
+    <bitmap id="bluetooth_ok" filename="images/Bluetooth-ok.png" />
+    <bitmap id="bluetooth_error" filename="images/Bluetooth-error.png" />
     
     <fonts>
 		<font id="timefont" filename="fonts/impact.fnt" filter="0123456789:"/>

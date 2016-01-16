@@ -12,5 +12,7 @@
     <property id="UseSystemFont" type="boolean">false</property>
     <property id="UseDualTime" type="boolean">false</property>
     <property id="DualTimeTZ" type="number">0</property>
+    <property id="UseBluetoothIcon" type="boolean">true</property>
+    <property id="DemoMode" type="boolean">false</property>
 
 </properties>

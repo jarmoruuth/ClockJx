@@ -51,6 +51,9 @@ class ClockJxView extends Ui.WatchFace {
 	var use_system_font = false;
 	var dualtime = false;
 	var dualtimeTZ = 0;
+	var bluetooth_image;
+	var bluetooth_status;
+	var show_bluetooth_status;
 	var demo = false;	// DEMO
 	
 	var ColorsArr = [ [0, 0x000000], [1, 0x555555], [2, 0xAAAAAA], [3, 0x0000FF], [4, 0x00AA00], [5, 0x00FF00] , 
@@ -92,6 +95,8 @@ class ClockJxView extends Ui.WatchFace {
 			return;
 		}
 		settingsChanged = false;
+		
+		demo = checkBool(App.getApp().getProperty("DemoMode"));
 		
 		digital_clock = checkBool(App.getApp().getProperty("DigitalClock"));
 		Use24hFormat = checkBool(App.getApp().getProperty("Use24hFormat"));
@@ -152,6 +157,26 @@ class ClockJxView extends Ui.WatchFace {
     		bgcolor_with_image = Gfx.COLOR_TRANSPARENT;
     		use_bgcolor_with_image = false;
     	}
+    	show_bluetooth_status = checkBool(App.getApp().getProperty("UseBluetoothIcon"));
+    	if (show_bluetooth_status) {
+	    	if (Sys.getDeviceSettings().phoneConnected != bluetooth_status
+	    		|| bluetooth_image == null) 
+	    	{
+	    		bluetooth_image = null;
+	    		bluetooth_status = Sys.getDeviceSettings().phoneConnected;
+	    		if (bluetooth_status) {
+	    			bluetooth_image = Ui.loadResource(Rez.Drawables.bluetooth_ok);
+	    		} else {
+	    			bluetooth_image = Ui.loadResource(Rez.Drawables.bluetooth_error);
+	    		}
+	    	}
+	    	if (demo) {
+	    		bluetooth_image = null;
+	    		bluetooth_image = Ui.loadResource(Rez.Drawables.bluetooth_error);    		
+	    	}
+	    } else {
+	    	bluetooth_image = null;
+	    }
 	}
 
     function initialize() {
@@ -159,6 +184,7 @@ class ClockJxView extends Ui.WatchFace {
     	//digital_clock_font = Gfx.FONT_NUMBER_THAI_HOT;
         WatchFace.initialize();
         screen_shape = Sys.getDeviceSettings().screenShape;
+        bluetooth_status = true;
     }
 
     //! Load your resources here
@@ -274,6 +300,8 @@ class ClockJxView extends Ui.WatchFace {
 		var base_dualtime;
 		var pos_dualtime;
 		var justify_dualtime;
+		var bluetooth_x;
+		var bluetooth_y;
         
         getSettings();
 
@@ -298,7 +326,7 @@ class ClockJxView extends Ui.WatchFace {
         	dc.setColor(Gfx.COLOR_TRANSPARENT, bgcolor);
         	dc.clear();
         }
-
+        
         if (!digital_clock) { 
 	        // Draw the numbers
 			if (screen_shape == Sys.SCREEN_SHAPE_ROUND) {
@@ -353,6 +381,7 @@ class ClockJxView extends Ui.WatchFace {
 		// positions of each element
 		// * = optional
 		// dt = dualtime
+		// bt = bluetooth status
 		if (screen_shape == Sys.SCREEN_SHAPE_ROUND) {
 			// Round clock
 			if (digital_clock) {
@@ -377,11 +406,15 @@ class ClockJxView extends Ui.WatchFace {
 				base_dualtime = height - 3 * dim - 3 + fix - extra_fix;				
 				base_steps = height - 2 * dim - 2 - fix - extra_fix;
 				base_battery = height - dim - 1 - fix - extra_fix;
+				//bluetooth_x = 32;
+				//bluetooth_y = base_date  + 2;
+				bluetooth_x = width / 2 - 8;
+				bluetooth_y = 1;
 			} else {
 				//	analog clock
 				// 		dualtime*
 				//		altitude*
-				//		CENTER		date
+				//	bt	CENTER		date
 				//		steps*
 				//		battery
 				if (!dualtime || !mountain_mode) {
@@ -390,7 +423,6 @@ class ClockJxView extends Ui.WatchFace {
 				base_dualtime = dim/2 + dim + 1 + fix;
 				base_altitude = dim/2 + 2 * dim + 2 - fix;
 				// CENTER
-				fix = 0;
 				base_date = center + dim/2;
 				fix = 0;
 				if (!steps) {
@@ -398,12 +430,15 @@ class ClockJxView extends Ui.WatchFace {
 				}				
 				base_steps = height - dim/2 - 3 * dim - 3;
 				base_battery = height - dim/2 - 2 * dim - 2 - fix;
+				bluetooth_x = 2 * 16;
+				bluetooth_y = height / 2 - 8;
 			}
+		
 		} else {
 			// Square clock
 			if (digital_clock) {
 				//	digital clock
-				// 		altitude*
+				// 	bt	altitude*
 				//		date
 				//		TIME
 				//		steps*
@@ -425,7 +460,7 @@ class ClockJxView extends Ui.WatchFace {
 				justify_dualtime = Gfx.TEXT_JUSTIFY_LEFT;		
 			} else {
 				//	analog clock
-				// 		dualtime*
+				// 	bt	dualtime*
 				//		altitude*
 				//		CENTER		date
 				//		steps*
@@ -444,8 +479,15 @@ class ClockJxView extends Ui.WatchFace {
 				base_steps = height - 3 * dim - 3;
 				base_battery = height - 2 * dim - 2 - fix;
 			}
+			bluetooth_x = 0;
+			bluetooth_y = 0;
 		}
-    	
+		
+		// Draw bluetooth status
+		if (bluetooth_image != null) {
+			dc.drawBitmap(bluetooth_x, bluetooth_y, bluetooth_image);
+		}
+		
     	// Draw Altitude
 		if (mountain_mode) {		
 			var actInfo;
@@ -622,7 +664,7 @@ class ClockJxView extends Ui.WatchFace {
 			textdimarr = dc.getTextDimensions(timeStr, digital_clock_font);
 			textx = width/2 - textdimarr[0]/2;
 			texty = height/2 - textdimarr[1]/2; 
-			if (screen_shape != Sys.SCREEN_SHAPE_ROUND) {
+			if (screen_shape != Sys.SCREEN_SHAPE_ROUND && use_system_font) {
 				texty = texty + 4;
 			} 		
          	if (use_bgcolor_with_image && image_num != 0) {
@@ -678,7 +720,7 @@ class ClockJxView extends Ui.WatchFace {
 	        dc.setColor(Gfx.COLOR_BLACK,Gfx.COLOR_BLACK);
 	        dc.drawCircle(width/2, height/2, 9);
 	 	}
-    }
+	}
 
     //! Called when this View is removed from the screen. Save the
     //! state of this View here. This includes freeing resources from

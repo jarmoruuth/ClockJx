@@ -77,4 +77,12 @@
         <settingConfig type="boolean" />
     </setting>
 
+    <setting propertyKey="@Properties.UseBluetoothIcon" title="@Strings.UseBluetoothIconTitle">
+        <settingConfig type="boolean" />
+    </setting>
+
+    <setting propertyKey="@Properties.DemoMode" title="@Strings.DemoModeTitle">
+        <settingConfig type="boolean" />
+    </setting>
+
 </settings>
