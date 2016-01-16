@@ -210,7 +210,7 @@ class ClockJxView extends Ui.WatchFace {
        	}
        	if (draw_type != 2) {
        		// minutes or hours hand
-        	dc.fillCircle(endX, endY, width / 2 - 1);
+        	dc.fillCircle(endX, endY, width / 2);
         }
     }
 
@@ -506,9 +506,9 @@ class ClockJxView extends Ui.WatchFace {
 			var min_hand_width = 6;        
         
             dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
-	        min_hand_length = height/2 - analog_num_dim - min_hand_width/2;
+	        min_hand_length = height/2 - analog_num_dim - 1;
 	        if (screen_shape == Sys.SCREEN_SHAPE_ROUND) {
-				hour_hand_length = min_hand_length * 3 / 4;
+				hour_hand_length = min_hand_length * 65 / 100;
 				// Draw the hash marks
 	        	drawHashMarks(dc);
 			} else {
@@ -519,22 +519,20 @@ class ClockJxView extends Ui.WatchFace {
 	        // compute the angle.
 			var clock_hour = clockTime.hour;
 			var clock_min = clockTime.min;
+clock_hour = 12;	// XXX
+clock_min = 14;		// XXX
 			//var clock_hour = 10;
 			//var clock_min = 12;
 			
 	        hour = ( ( ( clock_hour % 12 ) * 60 ) + clock_min );	        
 	        hour = hour / (12 * 60.0);
 	        hour = hour * Math.PI * 2;
-	        if (image_num != 0) {
-	        	drawHand(dc, hour, hour_hand_length, hour_hand_width+2, 0, Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
-	        }        
+	        drawHand(dc, hour, hour_hand_length, hour_hand_width+2, 0, bgcolor, bgcolor);        
 	        drawHand(dc, hour, hour_hand_length, hour_hand_width, 1, fgcolor, bgcolor);
 	        
 	        // Draw the minute		
 	        min = ( clock_min / 60.0) * Math.PI * 2;	        
-	        if (image_num != 0) {
-	        	drawHand(dc, min, min_hand_length, min_hand_width+2, 0, Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
-	        }
+	        drawHand(dc, min, min_hand_length, min_hand_width+2, 0, bgcolor, bgcolor);
 	        drawHand(dc, min, min_hand_length, min_hand_width, 0, fgcolor, bgcolor);
 	        
 	        // Draw the inner circle
