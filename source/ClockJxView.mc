@@ -159,8 +159,16 @@ class ClockJxView extends Ui.WatchFace {
     	}
     	show_bluetooth_status = checkBool(App.getApp().getProperty("UseBluetoothIcon"));
     	if (show_bluetooth_status) {
-	    	if (Sys.getDeviceSettings().phoneConnected != bluetooth_status
-	    		|| bluetooth_image == null) 
+	    	if (demo) {
+	    		bluetooth_status = !bluetooth_status;
+	    		bluetooth_image = null;
+	    		if (bluetooth_status) {
+	    			bluetooth_image = Ui.loadResource(Rez.Drawables.bluetooth_ok);
+	    		} else {
+	    			bluetooth_image = Ui.loadResource(Rez.Drawables.bluetooth_error);
+	    		}   		
+	    	} else if (Sys.getDeviceSettings().phoneConnected != bluetooth_status
+	    			    || bluetooth_image == null) 
 	    	{
 	    		bluetooth_image = null;
 	    		bluetooth_status = Sys.getDeviceSettings().phoneConnected;
@@ -169,10 +177,6 @@ class ClockJxView extends Ui.WatchFace {
 	    		} else {
 	    			bluetooth_image = Ui.loadResource(Rez.Drawables.bluetooth_error);
 	    		}
-	    	}
-	    	if (demo) {
-	    		bluetooth_image = null;
-	    		bluetooth_image = Ui.loadResource(Rez.Drawables.bluetooth_error);    		
 	    	}
 	    } else {
 	    	bluetooth_image = null;
@@ -553,7 +557,7 @@ class ClockJxView extends Ui.WatchFace {
         		dc.setColor(bgcolor, hash_color);
         	}
         } else {
-        	dc.setColor(bgcolor, Gfx.COLOR_RED);
+        	dc.setColor(fgcolor, Gfx.COLOR_RED);
 	    }	    
         if (digital_clock) {
         	dc.drawText(width/2,base_date,Gfx.FONT_TINY, dateStr, Gfx.TEXT_JUSTIFY_CENTER);

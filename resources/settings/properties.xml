@@ -8,7 +8,7 @@
     <property id="Use24hFormat" type="boolean">false</property>
     <property id="MountainMode" type="boolean">false</property>
     <property id="Steps" type="boolean">false</property>
-    <property id="UseBackgroundColorWithImage" type="boolean">false</property>
+    <property id="UseBackgroundColorWithImage" type="boolean">true</property>
     <property id="UseSystemFont" type="boolean">false</property>
     <property id="UseDualTime" type="boolean">false</property>
     <property id="DualTimeTZ" type="number">0</property>
