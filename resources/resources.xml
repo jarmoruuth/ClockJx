@@ -1,0 +1,8 @@
+<resources>
+    
+    <bitmap id="bgimg1" filename="images/HaRo0009_edited.png" />
+    <bitmap id="bgimg2" filename="images/DSCF4361.png" />
+    <bitmap id="bgimg3" filename="images/IMG_0626.png" />
+    <bitmap id="bgimg4" filename="images/IMG_0916.png" />
+
+</resources>
