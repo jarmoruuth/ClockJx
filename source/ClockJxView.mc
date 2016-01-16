@@ -31,6 +31,7 @@ using Toybox.ActivityMonitor as ActMonitor;
 
 class ClockJxView extends Ui.WatchFace {
 
+	var settingsChanged = true;
 	var fgcolor;
 	var bgcolor;
 	var hash_color;
@@ -83,6 +84,11 @@ class ClockJxView extends Ui.WatchFace {
 	function getSettings() {
 		var new_image_num;
 		var new_use_system_font;
+		
+		if (!settingsChanged) {
+			return;
+		}
+		settingsChanged = false;
 		
 		digital_clock = checkBool(App.getApp().getProperty("DigitalClock"));
 		Use24hFormat = checkBool(App.getApp().getProperty("Use24hFormat"));
@@ -204,7 +210,7 @@ class ClockJxView extends Ui.WatchFace {
        	}
        	if (draw_type != 2) {
        		// minutes or hours hand
-        	dc.fillCircle(endX, endY, width / 2);
+        	dc.fillCircle(endX, endY, width / 2 - 1);
         }
     }
 
@@ -237,6 +243,7 @@ class ClockJxView extends Ui.WatchFace {
         var center;
         var base_up;
         var base_down;
+        var analog_num_dim = null;
         
         getSettings();
 
@@ -264,8 +271,13 @@ class ClockJxView extends Ui.WatchFace {
 
         if (!digital_clock) { 
 	        // Draw the numbers
-			font = Gfx.FONT_NUMBER_MILD;
-			dim = dc.getFontHeight(font);
+			if (screen_shape == Sys.SCREEN_SHAPE_ROUND) {
+				font = Gfx.FONT_NUMBER_MILD;
+			} else {
+				font = Gfx.FONT_SMALL;
+			}
+			analog_num_dim = dc.getFontHeight(font);
+			dim = analog_num_dim;
 			hour = clockTime.hour;
 			if (hour >= 12 && Use24hFormat) {
 				if (Battery >= battery_limit2) {
@@ -384,7 +396,13 @@ class ClockJxView extends Ui.WatchFace {
         	dc.setColor(bgcolor, Gfx.COLOR_RED);
 	    }	    
         if (digital_clock) {
-        	dc.drawText(width/2,base_up,Gfx.FONT_TINY, dateStr, Gfx.TEXT_JUSTIFY_CENTER);
+        	var date_base_up;
+        	if (mountain_mode) {
+        		date_base_up = base_up;
+        	} else {
+        		date_base_up = base_up - dim/2;
+        	}
+        	dc.drawText(width/2,date_base_up,Gfx.FONT_TINY, dateStr, Gfx.TEXT_JUSTIFY_CENTER);
         } else {
 	        dc.drawText(width-5,(height/2)-(dim/2),Gfx.FONT_TINY, dateStr, Gfx.TEXT_JUSTIFY_RIGHT);
 	  	}
@@ -447,9 +465,7 @@ class ClockJxView extends Ui.WatchFace {
        			dc.drawText(width/2,(65*height/100),Gfx.FONT_TINY, BatteryStr, Gfx.TEXT_JUSTIFY_CENTER);
        		}
        	}
-        
-
-      	
+              	
        	// Draw the time.        
         if (digital_clock) {
 			var timeStr;
@@ -469,7 +485,10 @@ class ClockJxView extends Ui.WatchFace {
 			}
 			textdimarr = dc.getTextDimensions(timeStr, digital_clock_font);
 			textx = width/2 - textdimarr[0]/2;
-			texty = height/2 - textdimarr[1]/2;  		
+			texty = height/2 - textdimarr[1]/2; 
+			if (screen_shape != Sys.SCREEN_SHAPE_ROUND) {
+				texty = texty + 4;
+			} 		
          	if (use_bgcolor_with_image && image_num != 0) {
          		dc.setColor(bgcolor, Gfx.COLOR_TRANSPARENT);
          		dc.drawText(textx, texty, digital_clock_font, timeStr, Gfx.TEXT_JUSTIFY_LEFT);
@@ -481,28 +500,42 @@ class ClockJxView extends Ui.WatchFace {
          		dc.drawText(textx, texty, digital_clock_font, timeStr, Gfx.TEXT_JUSTIFY_LEFT);
          	}
         } else {
+        	var hour_hand_length;
+			var min_hand_length;        
+        	var hour_hand_width = 9;
+			var min_hand_width = 6;        
+        
             dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
-        	if (screen_shape == Sys.SCREEN_SHAPE_ROUND) { 
-	        	// Draw the hash marks
+	        min_hand_length = height/2 - analog_num_dim - min_hand_width/2;
+	        if (screen_shape == Sys.SCREEN_SHAPE_ROUND) {
+				hour_hand_length = min_hand_length * 3 / 4;
+				// Draw the hash marks
 	        	drawHashMarks(dc);
-	        }
-	        
+			} else {
+				hour_hand_length = min_hand_length * 2 / 3;
+			}
+	        	       
 	        // Draw the hour. Convert it to minutes and
 	        // compute the angle.
-	        hour = ( ( ( clockTime.hour % 12 ) * 60 ) + clockTime.min );	        
+			var clock_hour = clockTime.hour;
+			var clock_min = clockTime.min;
+			//var clock_hour = 10;
+			//var clock_min = 12;
+			
+	        hour = ( ( ( clock_hour % 12 ) * 60 ) + clock_min );	        
 	        hour = hour / (12 * 60.0);
 	        hour = hour * Math.PI * 2;
 	        if (image_num != 0) {
-	        	drawHand(dc, hour, 52, 11, 0, Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
+	        	drawHand(dc, hour, hour_hand_length, hour_hand_width+2, 0, Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
 	        }        
-	        drawHand(dc, hour, 52, 9, 1, fgcolor, bgcolor);
+	        drawHand(dc, hour, hour_hand_length, hour_hand_width, 1, fgcolor, bgcolor);
 	        
 	        // Draw the minute		
-	        min = ( clockTime.min / 60.0) * Math.PI * 2;	        
+	        min = ( clock_min / 60.0) * Math.PI * 2;	        
 	        if (image_num != 0) {
-	        	drawHand(dc, min, 80, 8, 0, Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
+	        	drawHand(dc, min, min_hand_length, min_hand_width+2, 0, Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
 	        }
-	        drawHand(dc, min, 80, 6, 0, fgcolor, bgcolor);
+	        drawHand(dc, min, min_hand_length, min_hand_width, 0, fgcolor, bgcolor);
 	        
 	        // Draw the inner circle
 	        dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_BLACK);
