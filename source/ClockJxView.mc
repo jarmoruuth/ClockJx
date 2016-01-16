@@ -51,6 +51,7 @@ class ClockJxView extends Ui.WatchFace {
 	var use_system_font = false;
 	var dualtime = false;
 	var dualtimeTZ = 0;
+	var demo = false;	// DEMO
 	
 	var ColorsArr = [ [0, 0x000000], [1, 0x555555], [2, 0xAAAAAA], [3, 0x0000FF], [4, 0x00AA00], [5, 0x00FF00] , 
 					  [6, 0xFF5500], [7, 0xFFAA00], [8, 0xFFFFFF], [-1, -1]];
@@ -464,9 +465,11 @@ class ClockJxView extends Ui.WatchFace {
 				} 				
 			}
 			var metric = Sys.getDeviceSettings().elevationUnits == Sys.UNIT_METRIC;
-			//unknownaltitude = false;	// DEMO			
-			//metric = true;				// DEMO
-			//actaltitude = 2238;			// DEMO				
+			if (demo) {
+				unknownaltitude = false;	// DEMO			
+				metric = true;				// DEMO
+				actaltitude = 2238;			// DEMO
+			}				
 			if (unknownaltitude) {
 				altitudeStr = Lang.format(" Alt unknown");
 			} else {
@@ -565,8 +568,10 @@ class ClockJxView extends Ui.WatchFace {
 					unknownsteps = false;
 				}
 			}
-			//unknownsteps = false; 	//DEMO
-			//actsteps = 2968;		// DEMO
+			if (demo) {
+				unknownsteps = false; 	//DEMO
+				actsteps = 2968;		// DEMO
+			}
 			if (unknownsteps) {
 				stepsStr = Lang.format(" unknown steps ", [actsteps]);
 			} else {
@@ -633,8 +638,8 @@ class ClockJxView extends Ui.WatchFace {
         } else {
         	var hour_hand_length;
 			var min_hand_length;        
-        	var hour_hand_width = 9;
-			var min_hand_width = 7;        
+        	var hour_hand_width = 8;
+			var min_hand_width = 6;        
         
             dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
 	        
@@ -650,9 +655,10 @@ class ClockJxView extends Ui.WatchFace {
 	        // compute the angle.
 			var clock_hour = clockTime.hour;
 			var clock_min = clockTime.min;
-			//clock_hour = 9;	// DEMO
-			//clock_min = 15;		// DEMO
-			
+			if (demo) {
+				clock_hour = 10;	// DEMO
+				clock_min = 12;		// DEMO
+			}
 	        hour = ( ( ( clock_hour % 12 ) * 60 ) + clock_min );	        
 	        hour = hour / (12 * 60.0);
 	        hour = hour * Math.PI * 2;
