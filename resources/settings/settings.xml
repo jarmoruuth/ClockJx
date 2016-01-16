@@ -6,13 +6,15 @@
     
     <setting propertyKey="@Properties.ForegroundColor" title="@Strings.ForegroundColorTitle">
         <settingConfig type="list">
-            <listEntry value="0x000000">@Strings.ColorBlack</listEntry>
-            <listEntry value="0xAAAAAA">@Strings.ColorLightGray</listEntry>            
-            <listEntry value="0x0000FF">@Strings.ColorBlue</listEntry>
-            <listEntry value="0x00FF00">@Strings.ColorGreen</listEntry>            
+            <listEntry value="0x000000">@Strings.ColorBlack</listEntry>        
+            <listEntry value="0x555555">@Strings.ColorDarkGray</listEntry>
+            <listEntry value="0xAAAAAA">@Strings.ColorLightGray</listEntry>
+            <listEntry value="0x0000FF">@Strings.ColorDarkBlue</listEntry>
+            <listEntry value="0x00AA00">@Strings.ColorDarkGreen</listEntry>
+            <listEntry value="0x00FF00">@Strings.ColorGreen</listEntry>
             <listEntry value="0xFF5500">@Strings.ColorOrange</listEntry>
-            <listEntry value="0xFFAA00">@Strings.ColorYellow</listEntry>            
-            <listEntry value="0xFFFFFF">@Strings.ColorWhite</listEntry>
+            <listEntry value="0xFFAA00">@Strings.ColorYellow</listEntry>                        
+            <listEntry value="0xFFFFFF">@Strings.ColorWhite</listEntry> 
         </settingConfig>
     </setting>
 
@@ -23,6 +25,9 @@
             <listEntry value="0xAAAAAA">@Strings.ColorLightGray</listEntry>
             <listEntry value="0x0000FF">@Strings.ColorDarkBlue</listEntry>
             <listEntry value="0x00AA00">@Strings.ColorDarkGreen</listEntry>
+            <listEntry value="0x00FF00">@Strings.ColorGreen</listEntry>
+            <listEntry value="0xFF5500">@Strings.ColorOrange</listEntry>
+            <listEntry value="0xFFAA00">@Strings.ColorYellow</listEntry>                        
             <listEntry value="0xFFFFFF">@Strings.ColorWhite</listEntry>            
         </settingConfig>
     </setting>
@@ -34,6 +39,8 @@
             <listEntry value="2">@Strings.BgImg2</listEntry>
             <listEntry value="3">@Strings.BgImg3</listEntry>
             <listEntry value="4">@Strings.BgImg4</listEntry>
+            <listEntry value="5">@Strings.BgImg5</listEntry>
+            <listEntry value="6">@Strings.BgImg6</listEntry>                 
         </settingConfig>
     </setting>
 

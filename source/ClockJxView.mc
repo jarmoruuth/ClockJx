@@ -23,9 +23,10 @@ class ClockJxView extends Ui.WatchFace {
 	var steps;
 	var screen_shape;
 	var bgcolor_with_image;
+	var digital_clock_font;
 	
-	var fgColorsArr = [ [0, 0x000000], [1, 0xAAAAAA], [2, 0x0000FF], [3, 0x00FF00], [4, 0xFF5500], [5, 0xFFAA00] , [6, 0xFFFFFF], [-1, -1]];
-	var bgColorsArr = [ [0, 0x000000], [1, 0x555555], [2, 0xAAAAAA], [3, 0x0000FF], [4, 0x00AA00], [5, 0xFFFFFF] , [-1, -1]];
+	var ColorsArr = [ [0, 0x000000], [1, 0x555555], [2, 0xAAAAAA], [3, 0x0000FF], [4, 0x00AA00], [5, 0x00FF00] , 
+					  [6, 0xFF5500], [7, 0xFFAA00], [8, 0xFFFFFF], [-1, -1]];
 	
 	function checkBool(b) {
 		if (b == null || (b != true && b != false)) {
@@ -41,15 +42,15 @@ class ClockJxView extends Ui.WatchFace {
 		return n.toNumber();
 	}
 	
-	function checkColor(c, arr, defcolor) {
+	function checkColor(c, defcolor) {
 		var n;
 		if (c == null) {
 			return defcolor;
 		}
 		n = c.toNumber();
-		for (var i = 0; arr[i][0] != -1; i = i + 1) {
-			if (n == arr[i][0] || n == arr[i][1]) {
-				return arr[i][1];
+		for (var i = 0; ColorsArr[i][0] != -1; i = i + 1) {
+			if (n == ColorsArr[i][0] || n == ColorsArr[i][1]) {
+				return ColorsArr[i][1];
 			}
 		}
 		return defcolor;
@@ -73,13 +74,17 @@ class ClockJxView extends Ui.WatchFace {
        			background = Ui.loadResource(Rez.Drawables.bgimg3);
         	} else if (new_image_num == 4) {
        			background = Ui.loadResource(Rez.Drawables.bgimg4);
+        	} else if (new_image_num == 5) {
+       			background = Ui.loadResource(Rez.Drawables.bgimg5);
+        	} else if (new_image_num == 6) {
+       			background = Ui.loadResource(Rez.Drawables.bgimg6);       			
         	} else {
        			new_image_num = 0;
         	}			
     	}
     	image_num = new_image_num;
-       	fgcolor = checkColor(App.getApp().getProperty("ForegroundColor"), fgColorsArr, Gfx.COLOR_WHITE);
-       	bgcolor = checkColor(App.getApp().getProperty("BackgroundColor"), bgColorsArr, Gfx.COLOR_BLACK);
+       	fgcolor = checkColor(App.getApp().getProperty("ForegroundColor"), Gfx.COLOR_WHITE);
+       	bgcolor = checkColor(App.getApp().getProperty("BackgroundColor"), Gfx.COLOR_BLACK);
     	if (fgcolor == Gfx.COLOR_WHITE && bgcolor == Gfx.COLOR_BLACK && image_num == 0) {
     		hash_color = Gfx.COLOR_LT_GRAY;
     	} else {
@@ -97,7 +102,8 @@ class ClockJxView extends Ui.WatchFace {
     }
 
     //! Load your resources here
-    function onLayout(dc) {
+    function onLayout(dc) {		
+		digital_clock_font = Gfx.FONT_NUMBER_THAI_HOT;
     }
 
     //! Called when this View is brought to the foreground. Restore
@@ -188,7 +194,6 @@ class ClockJxView extends Ui.WatchFace {
         var digital_dim;
         var dateStr;
         var center;
-        var digital_clock_font;
         var base_up;
         var base_down;
         
@@ -253,9 +258,7 @@ class ClockJxView extends Ui.WatchFace {
 	 	}
 
 		// fonts and dimensions
-		digital_clock_font = Gfx.FONT_NUMBER_THAI_HOT;
 	    digital_dim = dc.getFontHeight(digital_clock_font); 
-
 	    dim = dc.getFontHeight(Gfx.FONT_TINY);
 	    
 	    if (digital_clock) {
@@ -295,7 +298,7 @@ class ClockJxView extends Ui.WatchFace {
 						highaltide = true;
 					}
 				} 				
-			}
+			}	
 			if (unknownaltitude) {
 				altitudeStr = Lang.format(" Alt unknown");
 			} else {
@@ -409,7 +412,7 @@ class ClockJxView extends Ui.WatchFace {
        		}
        	}
         
-        dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
+
       	
        	// Draw the time.        
         if (digital_clock) {
@@ -425,8 +428,10 @@ class ClockJxView extends Ui.WatchFace {
 			} else {
 				timeStr = timeStr + Lang.format("$1$", [clockTime.min]);
 			}		
+			dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
          	dc.drawText(width/2,center-digital_dim/2,digital_clock_font, timeStr, Gfx.TEXT_JUSTIFY_CENTER);
         } else {
+            dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
         	if (screen_shape == Sys.SCREEN_SHAPE_ROUND) { 
 	        	// Draw the hash marks
 	        	drawHashMarks(dc);
