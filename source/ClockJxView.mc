@@ -187,7 +187,7 @@ class ClockJxView extends Ui.WatchFace {
 			length = start + length;
 		} else {
 			// minute and hours hands
-			start = 0;
+			start = -20;
 		}
         var coords = [];
         var ncoords;
@@ -462,13 +462,16 @@ class ClockJxView extends Ui.WatchFace {
 						highaltide = true;
 					}
 				} 				
-			}	
+			}
+			var metric = Sys.getDeviceSettings().elevationUnits == Sys.UNIT_METRIC;
+			//unknownaltitude = false;	// DEMO			
+			//metric = true;				// DEMO
+			//actaltitude = 2238;			// DEMO				
 			if (unknownaltitude) {
 				altitudeStr = Lang.format(" Alt unknown");
 			} else {
 				altitudeStr = Lang.format(" Alt $1$", [actaltitude.toLong()]);
 			}
-			var metric = Sys.getDeviceSettings().elevationUnits == Sys.UNIT_METRIC;
 			if (metric) {
 				altitudeStr = altitudeStr + " m ";
 			} else {
@@ -562,6 +565,8 @@ class ClockJxView extends Ui.WatchFace {
 					unknownsteps = false;
 				}
 			}
+			//unknownsteps = false; 	//DEMO
+			//actsteps = 2968;		// DEMO
 			if (unknownsteps) {
 				stepsStr = Lang.format(" unknown steps ", [actsteps]);
 			} else {
@@ -634,8 +639,10 @@ class ClockJxView extends Ui.WatchFace {
             dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
 	        
 	        var hash_len = analog_num_dim / 2;
-	        min_hand_length = height/2 - hash_len - 4 - 1;
-			hour_hand_length = min_hand_length * 65 / 100;
+	        //min_hand_length = height/2 - hash_len - 4 - 1;
+	        min_hand_length = height/2 - min_hand_width - 4 - 1;
+			//hour_hand_length = min_hand_length * 65 / 100;
+			hour_hand_length = height/2 - analog_num_dim - hour_hand_width - 4 - 1;
 			// Draw the hash marks
 	        drawHashMarks(dc, hash_len, 4);
 	        	       
@@ -643,8 +650,8 @@ class ClockJxView extends Ui.WatchFace {
 	        // compute the angle.
 			var clock_hour = clockTime.hour;
 			var clock_min = clockTime.min;
-			//clock_hour = 10;
-			//clock_min = 12;
+			//clock_hour = 9;	// DEMO
+			//clock_min = 15;		// DEMO
 			
 	        hour = ( ( ( clock_hour % 12 ) * 60 ) + clock_min );	        
 	        hour = hour / (12 * 60.0);
