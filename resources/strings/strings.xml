@@ -36,6 +36,6 @@
     <string id="BgImg7">7</string>
     
   	<string id="DualTime">Dual time</string>
-  	<string id="DualTimeTZ">Dual time time zone</string>
+  	<string id="DualTimeTZ">Time zone for dual time</string>
 
 </strings>

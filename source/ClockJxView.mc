@@ -206,19 +206,27 @@ class ClockJxView extends Ui.WatchFace {
     //! @param angle Angle to draw the watch hand
     //! @param length Length of the watch hand
     //! @param width Width of the watch hand
-    function drawHand(dc, angle, length, width, draw_type, fgcol, bgcol)
+    function drawHand(dc, angle, length, width, draw_type, fgcol, bgcol, border)
     {
         // Map out the coordinates of the watch hand
 		var start;
         var dev_height = dc.getHeight();		
         var dev_width = dc.getWidth();
+        if (border) {
+        	length = length + 1;
+        	width = width + 2;
+        }
 		if (draw_type == 2) {
 			// hour marks
 			start = dev_height / 2 - length - 4;
 			length = start + length;
 		} else {
 			// minute and hours hands
-			start = -20;
+			if (border) {
+				start = -21;
+			} else {
+				start = -20;
+			}
 		}
         var coords = [];
         var ncoords;
@@ -280,7 +288,7 @@ class ClockJxView extends Ui.WatchFace {
         		hour = i * 60;
         		hour = hour / (12 * 60.0);
         		hour = hour * Math.PI * 2;
-        		drawHand(dc, hour, length, width, 2, fgcolor, bgcolor);
+        		drawHand(dc, hour, length, width, 2, fgcolor, bgcolor, false);
         	}
         }
     }
@@ -708,13 +716,13 @@ class ClockJxView extends Ui.WatchFace {
 	        hour = ( ( ( clock_hour % 12 ) * 60 ) + clock_min );	        
 	        hour = hour / (12 * 60.0);
 	        hour = hour * Math.PI * 2;
-	        drawHand(dc, hour, hour_hand_length, hour_hand_width+2, 0, bgcolor, bgcolor);        
-	        drawHand(dc, hour, hour_hand_length, hour_hand_width, 1, fgcolor, bgcolor);
+	        drawHand(dc, hour, hour_hand_length, hour_hand_width, 0, bgcolor, bgcolor, true);        
+	        drawHand(dc, hour, hour_hand_length, hour_hand_width, 1, fgcolor, bgcolor, false);
 	        
 	        // Draw the minute		
 	        min = ( clock_min / 60.0) * Math.PI * 2;	        
-	        drawHand(dc, min, min_hand_length, min_hand_width+2, 0, bgcolor, bgcolor);
-	        drawHand(dc, min, min_hand_length, min_hand_width, 0, fgcolor, bgcolor);
+	        drawHand(dc, min, min_hand_length, min_hand_width, 0, bgcolor, bgcolor, true);
+	        drawHand(dc, min, min_hand_length, min_hand_width, 0, fgcolor, bgcolor, false);
 	        
 	        // Draw the inner circle
 	        dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_BLACK);
