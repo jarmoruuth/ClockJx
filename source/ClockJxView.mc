@@ -49,6 +49,8 @@ class ClockJxView extends Ui.WatchFace {
 	var use_bgcolor_with_image = false;
 	var digital_clock_font;
 	var use_system_font = false;
+	var dualtime = false;
+	var dualtimeTZ = 0;
 	
 	var ColorsArr = [ [0, 0x000000], [1, 0x555555], [2, 0xAAAAAA], [3, 0x0000FF], [4, 0x00AA00], [5, 0x00FF00] , 
 					  [6, 0xFF5500], [7, 0xFFAA00], [8, 0xFFFFFF], [-1, -1]];
@@ -94,9 +96,14 @@ class ClockJxView extends Ui.WatchFace {
 		Use24hFormat = checkBool(App.getApp().getProperty("Use24hFormat"));
 		mountain_mode = checkBool(App.getApp().getProperty("MountainMode"));
 		steps = checkBool(App.getApp().getProperty("Steps"));
-		screen_shape = Sys.getDeviceSettings().screenShape;
+		dualtime = checkBool(App.getApp().getProperty("UseDualTime"));
+		dualtimeTZ = checkNumber(App.getApp().getProperty("DualTimeTZ"));
+
 		new_use_system_font = checkBool(App.getApp().getProperty("UseSystemFont"));
-		if (new_use_system_font != use_system_font) {
+		if (dualtime && screen_shape != Sys.SCREEN_SHAPE_ROUND) {
+			//new_use_system_font = true;
+		}
+		if (digital_clock && new_use_system_font != use_system_font) {
 			use_system_font = new_use_system_font;
 			digital_clock_font = null;
 			if (use_system_font) {
@@ -105,6 +112,9 @@ class ClockJxView extends Ui.WatchFace {
 				digital_clock_font = Ui.loadResource(Rez.Fonts.timefont);    			
 			}
 		}
+		//if (use_system_font && steps && dualtime && digital_clock) {
+		//	digital_clock_font = Gfx.FONT_NUMBER_THAI_HOT;
+		//}
 		new_image_num = checkNumber(App.getApp().getProperty("BackgroundImage"));
 		if (new_image_num != image_num && new_image_num != 0) {
 			background = null;
@@ -147,6 +157,7 @@ class ClockJxView extends Ui.WatchFace {
     	digital_clock_font = Ui.loadResource(Rez.Fonts.timefont);
     	//digital_clock_font = Gfx.FONT_NUMBER_THAI_HOT;
         WatchFace.initialize();
+        screen_shape = Sys.getDeviceSettings().screenShape;
     }
 
     //! Load your resources here
@@ -241,9 +252,14 @@ class ClockJxView extends Ui.WatchFace {
         var digital_dim;
         var dateStr;
         var center;
-        var base_up;
-        var base_down;
         var analog_num_dim = null;
+		var base_date;
+		var base_altitude;
+		var base_battery;
+		var base_steps;
+		var base_dualtime;
+		var pos_dualtime;
+		var justify_dualtime;
         
         getSettings();
 
@@ -314,23 +330,51 @@ class ClockJxView extends Ui.WatchFace {
 	    digital_dim = dc.getFontHeight(digital_clock_font);
 	    dim = dc.getFontHeight(Gfx.FONT_TINY);	   
     	center = height/2;
+
+		pos_dualtime = width / 2;
+		justify_dualtime = Gfx.TEXT_JUSTIFY_CENTER;
+				    	
+		// positions of each element
+		if (screen_shape == Sys.SCREEN_SHAPE_ROUND) {
+			// Round clock
+			if (digital_clock) {
+				//	digital clock
+				base_altitude = dim + 1;
+				base_date = 2 * dim + 2;
+				base_dualtime = height - 3 * dim - 3 - 3;				
+				base_steps = height - 2 * dim - 2 - 3;
+				base_battery = height - dim - 1 - 3;
+			} else {
+				//	analog clock
+				base_dualtime = dim/2 + dim + 1;
+				base_altitude = dim/2 + 2 * dim + 2;
+				base_date = center + dim/2;				
+				base_steps = height - dim/2 - 3 * dim - 3;
+				base_battery = height - dim/2 - 2 * dim - 2;
+			}
+		} else {
+			// Square clock
+			if (digital_clock) {
+				//	digital clock
+				base_altitude = 1;
+				base_date = dim + 2;
+				base_steps = height - 2 * dim - 2;
+				base_battery = height - dim - 1;				
+				base_dualtime = height - dim - 1;	// lower left corner
+				pos_dualtime = 1;		
+				justify_dualtime = Gfx.TEXT_JUSTIFY_LEFT;		
+			} else {
+				//	analog clock
+				base_dualtime = dim + 1;
+				base_altitude = 2 * dim + 2;
+				base_date = center + dim/2;				
+				base_steps = height - 3 * dim - 3;
+				base_battery = height - 2 * dim - 2;
+			}
+		}
     	
-	    if (screen_shape == Sys.SCREEN_SHAPE_ROUND) {
-	    	//base_up = center-digital_dim/2-10-2*digital_clock_font_offset;
-	    	//base_down = center+digital_dim/2-10;
-	    	//base_down = center+digital_dim/2;
-			base_up = 2 * dim;
-			base_down = 2*center-2*dim-dim/2;
-	    } else {
-	    	base_up = dim+1;
-	    	base_down = 2*center-2*dim-1;
-	    	if (!digital_clock) {
-	    		base_down = base_down - 3;
-	    	}
-	    }
-	    
-		if (mountain_mode) {
-			// Draw Altitude
+    	// Draw Altitude
+		if (mountain_mode) {		
 			var actInfo;
 			var altitudeStr;
 			var highaltide = false;			
@@ -374,11 +418,7 @@ class ClockJxView extends Ui.WatchFace {
 					dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
 				}
 			}
-			if (digital_clock) {
-				dc.drawText(width/2,base_up-dim-1,Gfx.FONT_TINY, altitudeStr, Gfx.TEXT_JUSTIFY_CENTER);
-			} else {
-        		dc.drawText(width/2,(height/4)-1,Gfx.FONT_TINY, altitudeStr, Gfx.TEXT_JUSTIFY_CENTER);
-       		}
+       		dc.drawText(width/2,base_altitude,Gfx.FONT_TINY, altitudeStr, Gfx.TEXT_JUSTIFY_CENTER);
         }
         
 		// Draw date        
@@ -396,16 +436,44 @@ class ClockJxView extends Ui.WatchFace {
         	dc.setColor(bgcolor, Gfx.COLOR_RED);
 	    }	    
         if (digital_clock) {
-        	var date_base_up;
-        	if (mountain_mode) {
-        		date_base_up = base_up;
-        	} else {
-        		date_base_up = base_up - dim/2;
-        	}
-        	dc.drawText(width/2,date_base_up,Gfx.FONT_TINY, dateStr, Gfx.TEXT_JUSTIFY_CENTER);
+        	dc.drawText(width/2,base_date,Gfx.FONT_TINY, dateStr, Gfx.TEXT_JUSTIFY_CENTER);
         } else {
 	        dc.drawText(width-5,(height/2)-(dim/2),Gfx.FONT_TINY, dateStr, Gfx.TEXT_JUSTIFY_RIGHT);
 	  	}
+	  	
+		// Draw dual time
+		if (dualtime) {
+			var timeStr;
+			var hour = clockTime.hour - clockTime.timeZoneOffset/3600;
+			
+			hour = hour + dualtimeTZ;
+			if (hour > 24) {
+				hour = hour - 24;
+			} else if (hour < 0) {
+				hour = 24 + hour;
+			}
+			if (hour < 10) {
+				timeStr = Lang.format(" 0$1$:", [hour]);
+			} else {
+				timeStr = Lang.format(" $1$:", [hour]);
+			}
+			if (clockTime.min < 10) {
+				timeStr = timeStr + Lang.format("0$1$ ", [clockTime.min]);
+			} else {
+				timeStr = timeStr + Lang.format("$1$ ", [clockTime.min]);
+			}
+			
+			if (Battery < battery_limit2) {
+				dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_RED);
+			} else {
+				if (image_num != 0) {
+					dc.setColor(fgcolor, bgcolor_with_image);
+				} else {
+					dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
+				}
+			}
+        	dc.drawText(pos_dualtime,base_dualtime,Gfx.FONT_TINY, timeStr, justify_dualtime);        
+		} 
 
 		// Draw Steps        
         if (steps) {
@@ -437,34 +505,24 @@ class ClockJxView extends Ui.WatchFace {
 					dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
 				}
 			}
-			if (digital_clock) {
-				dc.drawText(width/2,base_down-1,Gfx.FONT_TINY, stepsStr, Gfx.TEXT_JUSTIFY_CENTER);
-			} else {
-        		dc.drawText(width/2,(60*height/100)-1,Gfx.FONT_TINY, stepsStr, Gfx.TEXT_JUSTIFY_CENTER);
-       		}        
+			dc.drawText(width/2,base_steps,Gfx.FONT_TINY, stepsStr, Gfx.TEXT_JUSTIFY_CENTER);
         }
 
         // Draw battery
+		var battery_bgcolor;
+		if (bgcolor == Gfx.COLOR_WHITE) {
+			battery_bgcolor = bgcolor;
+		} else {
+			battery_bgcolor = Gfx.COLOR_BLACK;
+		}
 		if (Battery >= battery_limit1) { 
-			dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_BLACK);
+			dc.setColor(Gfx.COLOR_GREEN, battery_bgcolor);
 		} else if (Battery >= battery_limit2) {
-			dc.setColor(Gfx.COLOR_ORANGE, Gfx.COLOR_BLACK);		
+			dc.setColor(Gfx.COLOR_ORANGE, battery_bgcolor);		
 		} else {
 			dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_BLACK);		
 		}
-        if (digital_clock) {
-        	if (steps) {
-        		dc.drawText(width/2,base_down+dim,Gfx.FONT_TINY, BatteryStr, Gfx.TEXT_JUSTIFY_CENTER);
-        	} else {		
-        		dc.drawText(width/2,base_down+dim/2,Gfx.FONT_TINY, BatteryStr, Gfx.TEXT_JUSTIFY_CENTER);
-        	}
-       	} else {
-       		if (steps) {
-       			dc.drawText(width/2,(60*height/100)+dim,Gfx.FONT_TINY, BatteryStr, Gfx.TEXT_JUSTIFY_CENTER);
-       		} else {
-       			dc.drawText(width/2,(65*height/100),Gfx.FONT_TINY, BatteryStr, Gfx.TEXT_JUSTIFY_CENTER);
-       		}
-       	}
+        dc.drawText(width/2,base_battery,Gfx.FONT_TINY, BatteryStr, Gfx.TEXT_JUSTIFY_CENTER);
               	
        	// Draw the time.        
         if (digital_clock) {
@@ -519,10 +577,8 @@ class ClockJxView extends Ui.WatchFace {
 	        // compute the angle.
 			var clock_hour = clockTime.hour;
 			var clock_min = clockTime.min;
-clock_hour = 12;	// XXX
-clock_min = 14;		// XXX
-			//var clock_hour = 10;
-			//var clock_min = 12;
+			//clock_hour = 10;
+			//clock_min = 12;
 			
 	        hour = ( ( ( clock_hour % 12 ) * 60 ) + clock_min );	        
 	        hour = hour / (12 * 60.0);

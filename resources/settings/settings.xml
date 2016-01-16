@@ -45,6 +45,14 @@
         </settingConfig>
     </setting>
 
+    <setting propertyKey="@Properties.UseDualTime" title="@Strings.DualTime">
+        <settingConfig type="boolean" />
+    </setting>
+
+    <setting propertyKey="@Properties.DualTimeTZ" title="@Strings.DualTimeTZ">
+        <settingConfig type="numeric" required="true" min="-12" max="12" />
+    </setting>
+
     <setting propertyKey="@Properties.DigitalClock" title="@Strings.DigitalClockTitle">
         <settingConfig type="boolean" />
     </setting>

@@ -10,5 +10,7 @@
     <property id="Steps" type="boolean">false</property>
     <property id="UseBackgroundColorWithImage" type="boolean">false</property>
     <property id="UseSystemFont" type="boolean">false</property>
+    <property id="UseDualTime" type="boolean">false</property>
+    <property id="DualTimeTZ" type="number">0</property>
 
 </properties>

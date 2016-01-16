@@ -31,6 +31,9 @@
     <string id="BgImg4">4</string>           
     <string id="BgImg5">5</string>
     <string id="BgImg6">6</string>
-    <string id="BgImg7">7</string>    
+    <string id="BgImg7">7</string>
+    
+  	<string id="DualTime">Dual time</string>
+  	<string id="DualTimeTZ">Dual time time zone</string>
 
 </strings>
