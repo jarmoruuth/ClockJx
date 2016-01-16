@@ -51,9 +51,10 @@ class ClockJxView extends Ui.WatchFace {
 	var use_system_font = false;
 	var dualtime = false;
 	var dualtimeTZ = 0;
-	var bluetooth_image;
-	var bluetooth_status;
-	var show_bluetooth_status;
+	var bluetooth_ok_image;
+	var bluetooth_error_image;
+	var bluetooth_status = true;
+	var show_bluetooth_status = true;
 	var demo = false;	// DEMO
 	
 	var ColorsArr = [ [0, 0x000000], [1, 0x555555], [2, 0xAAAAAA], [3, 0x0000FF], [4, 0x00AA00], [5, 0x00FF00] , 
@@ -161,25 +162,16 @@ class ClockJxView extends Ui.WatchFace {
     	if (show_bluetooth_status) {
 	    	if (demo) {
 	    		bluetooth_status = !bluetooth_status;
-	    		bluetooth_image = null;
-	    		if (bluetooth_status) {
-	    			bluetooth_image = Ui.loadResource(Rez.Drawables.bluetooth_ok);
-	    		} else {
-	    			bluetooth_image = Ui.loadResource(Rez.Drawables.bluetooth_error);
-	    		}   		
-	    	} else if (Sys.getDeviceSettings().phoneConnected != bluetooth_status
-	    			    || bluetooth_image == null) 
-	    	{
-	    		bluetooth_image = null;
-	    		bluetooth_status = Sys.getDeviceSettings().phoneConnected;
-	    		if (bluetooth_status) {
-	    			bluetooth_image = Ui.loadResource(Rez.Drawables.bluetooth_ok);
-	    		} else {
-	    			bluetooth_image = Ui.loadResource(Rez.Drawables.bluetooth_error);
-	    		}
 	    	}
+	    	if (bluetooth_ok_image == null) {
+	    		bluetooth_ok_image = Ui.loadResource(Rez.Drawables.bluetooth_ok);
+	    	}
+	    	if (bluetooth_error_image == null) {
+    			bluetooth_error_image = Ui.loadResource(Rez.Drawables.bluetooth_error);
+    		}
 	    } else {
-	    	bluetooth_image = null;
+	    	bluetooth_ok_image = null;
+	    	bluetooth_error_image = null;
 	    }
 	}
 
@@ -496,8 +488,15 @@ class ClockJxView extends Ui.WatchFace {
 		}
 		
 		// Draw bluetooth status
-		if (bluetooth_image != null) {
-			dc.drawBitmap(bluetooth_x, bluetooth_y, bluetooth_image);
+		if (show_bluetooth_status) {
+			if (!demo) {
+				bluetooth_status = Sys.getDeviceSettings().phoneConnected;
+			}
+			if (bluetooth_status) {
+				dc.drawBitmap(bluetooth_x, bluetooth_y, bluetooth_ok_image);
+			} else {
+				dc.drawBitmap(bluetooth_x, bluetooth_y, bluetooth_error_image);			
+			}
 		}
 		
     	// Draw Altitude
