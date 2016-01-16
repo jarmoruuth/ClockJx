@@ -9,5 +9,6 @@
     <property id="MountainMode" type="boolean">false</property>
     <property id="Steps" type="boolean">false</property>
     <property id="UseBackgroundColorWithImage" type="boolean">false</property>
+    <property id="UseSystemFont" type="boolean">false</property>
 
 </properties>

@@ -7,6 +7,28 @@ using Toybox.Time.Gregorian as Calendar;
 using Toybox.Activity as Act;
 using Toybox.ActivityMonitor as ActMonitor;
 
+// Misc notes
+//
+// fonts
+// -----
+// 
+// use BMFont, set the "File format Texture" to "png"
+// 
+// resources.xml file:
+// <fonts>
+// <font id="id_konqa32_hd" filename="fonts/konqa32-hd.fnt" filter="0123456789"/>
+// </fonts>
+// 
+// in initialize(), have something like
+// 
+// bigNumFont=Ui.loadResource(Rez.Fonts.id_bignum);
+// 
+// sample for the layout
+// <label id="TimeLabel" x="113" y="63" font="@Fonts.font" justification="Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER" />
+// 
+// add the font to the resources.xml file and add "font=@Fonts.id_konqa32_hd" 
+// to layout file label definitions
+
 class ClockJxView extends Ui.WatchFace {
 
 	var fgcolor;
@@ -23,7 +45,9 @@ class ClockJxView extends Ui.WatchFace {
 	var steps;
 	var screen_shape;
 	var bgcolor_with_image;
+	var use_bgcolor_with_image = false;
 	var digital_clock_font;
+	var use_system_font = false;
 	
 	var ColorsArr = [ [0, 0x000000], [1, 0x555555], [2, 0xAAAAAA], [3, 0x0000FF], [4, 0x00AA00], [5, 0x00FF00] , 
 					  [6, 0xFF5500], [7, 0xFFAA00], [8, 0xFFFFFF], [-1, -1]];
@@ -58,14 +82,26 @@ class ClockJxView extends Ui.WatchFace {
 	
 	function getSettings() {
 		var new_image_num;
+		var new_use_system_font;
 		
 		digital_clock = checkBool(App.getApp().getProperty("DigitalClock"));
 		Use24hFormat = checkBool(App.getApp().getProperty("Use24hFormat"));
 		mountain_mode = checkBool(App.getApp().getProperty("MountainMode"));
 		steps = checkBool(App.getApp().getProperty("Steps"));
 		screen_shape = Sys.getDeviceSettings().screenShape;
+		new_use_system_font = checkBool(App.getApp().getProperty("UseSystemFont"));
+		if (new_use_system_font != use_system_font) {
+			use_system_font = new_use_system_font;
+			digital_clock_font = null;
+			if (use_system_font) {
+				digital_clock_font = Gfx.FONT_NUMBER_THAI_HOT;
+			} else {
+				digital_clock_font = Ui.loadResource(Rez.Fonts.timefont);    			
+			}
+		}
 		new_image_num = checkNumber(App.getApp().getProperty("BackgroundImage"));
 		if (new_image_num != image_num && new_image_num != 0) {
+			background = null;
 			if (new_image_num == 1) {
 	        	background = Ui.loadResource(Rez.Drawables.bgimg1);
         	} else if (new_image_num == 2) {
@@ -77,7 +113,9 @@ class ClockJxView extends Ui.WatchFace {
         	} else if (new_image_num == 5) {
        			background = Ui.loadResource(Rez.Drawables.bgimg5);
         	} else if (new_image_num == 6) {
-       			background = Ui.loadResource(Rez.Drawables.bgimg6);       			
+       			background = Ui.loadResource(Rez.Drawables.bgimg6);
+        	} else if (new_image_num == 7) {
+       			background = Ui.loadResource(Rez.Drawables.bgimg7);       			
         	} else {
        			new_image_num = 0;
         	}			
@@ -92,18 +130,21 @@ class ClockJxView extends Ui.WatchFace {
     	}
     	if (checkBool(App.getApp().getProperty("UseBackgroundColorWithImage"))) {
     		bgcolor_with_image = bgcolor;
+    		use_bgcolor_with_image = true;
     	} else {
     		bgcolor_with_image = Gfx.COLOR_TRANSPARENT;
+    		use_bgcolor_with_image = false;
     	}
 	}
 
     function initialize() {
+    	digital_clock_font = Ui.loadResource(Rez.Fonts.timefont);
+    	//digital_clock_font = Gfx.FONT_NUMBER_THAI_HOT;
         WatchFace.initialize();
     }
 
     //! Load your resources here
-    function onLayout(dc) {		
-		digital_clock_font = Gfx.FONT_NUMBER_THAI_HOT;
+    function onLayout(dc) {
     }
 
     //! Called when this View is brought to the foreground. Restore
@@ -258,21 +299,16 @@ class ClockJxView extends Ui.WatchFace {
 	 	}
 
 		// fonts and dimensions
-	    digital_dim = dc.getFontHeight(digital_clock_font); 
-	    dim = dc.getFontHeight(Gfx.FONT_TINY);
-	    
-	    if (digital_clock) {
-	    	if (mountain_mode && screen_shape == Sys.SCREEN_SHAPE_ROUND) {
-	    		center = height/2+10;
-	    	} else {
-	    		center = height/2;	    	
-	    	}
-	    } else {
-	    	center = height/2;
-	    }
+	    digital_dim = dc.getFontHeight(digital_clock_font);
+	    dim = dc.getFontHeight(Gfx.FONT_TINY);	   
+    	center = height/2;
+    	
 	    if (screen_shape == Sys.SCREEN_SHAPE_ROUND) {
-	    	base_up = center-digital_dim/2-10;
-	    	base_down = center+digital_dim/2-10;
+	    	//base_up = center-digital_dim/2-10-2*digital_clock_font_offset;
+	    	//base_down = center+digital_dim/2-10;
+	    	//base_down = center+digital_dim/2;
+			base_up = 2 * dim;
+			base_down = 2*center-2*dim-dim/2;
 	    } else {
 	    	base_up = dim+1;
 	    	base_down = 2*center-2*dim-1;
@@ -416,8 +452,11 @@ class ClockJxView extends Ui.WatchFace {
       	
        	// Draw the time.        
         if (digital_clock) {
-
 			var timeStr;
+			var textdimarr;
+			var textx;
+			var texty;
+			
 			if (clockTime.hour < 10) {
 				timeStr = Lang.format("0$1$:", [clockTime.hour]);
 			} else {
@@ -427,9 +466,20 @@ class ClockJxView extends Ui.WatchFace {
 				timeStr = timeStr + Lang.format("0$1$", [clockTime.min]);
 			} else {
 				timeStr = timeStr + Lang.format("$1$", [clockTime.min]);
-			}		
-			dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
-         	dc.drawText(width/2,center-digital_dim/2,digital_clock_font, timeStr, Gfx.TEXT_JUSTIFY_CENTER);
+			}
+			textdimarr = dc.getTextDimensions(timeStr, digital_clock_font);
+			textx = width/2 - textdimarr[0]/2;
+			texty = height/2 - textdimarr[1]/2;  		
+         	if (use_bgcolor_with_image && image_num != 0) {
+         		dc.setColor(bgcolor, Gfx.COLOR_TRANSPARENT);
+         		dc.drawText(textx, texty, digital_clock_font, timeStr, Gfx.TEXT_JUSTIFY_LEFT);
+         	
+         		dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
+         		dc.drawText(textx-2,texty-2, digital_clock_font, timeStr, Gfx.TEXT_JUSTIFY_LEFT);
+         	} else {
+         		dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
+         		dc.drawText(textx, texty, digital_clock_font, timeStr, Gfx.TEXT_JUSTIFY_LEFT);
+         	}
         } else {
             dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
         	if (screen_shape == Sys.SCREEN_SHAPE_ROUND) { 

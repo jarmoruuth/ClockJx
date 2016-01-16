@@ -41,6 +41,7 @@
             <listEntry value="4">@Strings.BgImg4</listEntry>
             <listEntry value="5">@Strings.BgImg5</listEntry>
             <listEntry value="6">@Strings.BgImg6</listEntry>                 
+            <listEntry value="7">@Strings.BgImg7</listEntry>
         </settingConfig>
     </setting>
 
@@ -61,6 +62,10 @@
     </setting>
 
    	<setting propertyKey="@Properties.UseBackgroundColorWithImage" title="@Strings.UseBackgroundColorWithImageTitle">
+        <settingConfig type="boolean" />
+    </setting>
+    
+    <setting propertyKey="@Properties.UseSystemFont" title="@Strings.UseSystemFontTitle">
         <settingConfig type="boolean" />
     </setting>
 
