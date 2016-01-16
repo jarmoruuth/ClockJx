@@ -6,24 +6,24 @@
     
     <setting propertyKey="@Properties.ForegroundColor" title="@Strings.ForegroundColorTitle">
         <settingConfig type="list">
-            <listEntry value="0xFFFFFF">@Strings.ColorWhite</listEntry>
+            <listEntry value="0x000000">@Strings.ColorBlack</listEntry>
             <listEntry value="0xAAAAAA">@Strings.ColorLightGray</listEntry>            
             <listEntry value="0x0000FF">@Strings.ColorBlue</listEntry>
             <listEntry value="0x00FF00">@Strings.ColorGreen</listEntry>            
             <listEntry value="0xFF5500">@Strings.ColorOrange</listEntry>
             <listEntry value="0xFFAA00">@Strings.ColorYellow</listEntry>            
-            <listEntry value="0x000000">@Strings.ColorBlack</listEntry>
+            <listEntry value="0xFFFFFF">@Strings.ColorWhite</listEntry>
         </settingConfig>
     </setting>
 
     <setting propertyKey="@Properties.BackgroundColor" title="@Strings.BackgroundColorTitle">
         <settingConfig type="list">
-            <listEntry value="0x000000">@Strings.ColorBlack</listEntry>
+            <listEntry value="0x000000">@Strings.ColorBlack</listEntry>        
             <listEntry value="0x555555">@Strings.ColorDarkGray</listEntry>
             <listEntry value="0xAAAAAA">@Strings.ColorLightGray</listEntry>
             <listEntry value="0x0000FF">@Strings.ColorDarkBlue</listEntry>
             <listEntry value="0x00AA00">@Strings.ColorDarkGreen</listEntry>
-            <listEntry value="0xFFFFFF">@Strings.ColorWhite</listEntry>
+            <listEntry value="0xFFFFFF">@Strings.ColorWhite</listEntry>            
         </settingConfig>
     </setting>
 
@@ -50,6 +50,10 @@
     </setting>
 
    	<setting propertyKey="@Properties.Steps" title="@Strings.StepsTitle">
+        <settingConfig type="boolean" />
+    </setting>
+
+   	<setting propertyKey="@Properties.UseBackgroundColorWithImage" title="@Strings.UseBackgroundColorWithImageTitle">
         <settingConfig type="boolean" />
     </setting>
 

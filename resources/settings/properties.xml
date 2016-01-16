@@ -1,6 +1,6 @@
 <properties>
 
-	<property id="appVersion" type="string">1.0.2</property>
+	<property id="appVersion" type="string">1.0.5</property>
     <property id="BackgroundColor" type="number">0x000000</property>
     <property id="ForegroundColor" type="number">0xFFFFFF</property>
     <property id="BackgroundImage" type="number">0</property>  
@@ -8,5 +8,6 @@
     <property id="Use24hFormat" type="boolean">false</property>
     <property id="MountainMode" type="boolean">false</property>
     <property id="Steps" type="boolean">false</property>
+    <property id="UseBackgroundColorWithImage" type="boolean">false</property>
 
 </properties>

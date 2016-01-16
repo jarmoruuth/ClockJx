@@ -22,8 +22,9 @@ class ClockJxView extends Ui.WatchFace {
 	var digital_clock;
 	var steps;
 	var screen_shape;
+	var bgcolor_with_image;
 	
-	var fgColorsArr = [ [0, 0xFFFFFF], [1, 0xAAAAAA], [2, 0x0000FF], [3, 0x00FF00], [4, 0xFF5500], [5, 0xFFAA00] , [6, 0x000000], [-1, -1]];
+	var fgColorsArr = [ [0, 0x000000], [1, 0xAAAAAA], [2, 0x0000FF], [3, 0x00FF00], [4, 0xFF5500], [5, 0xFFAA00] , [6, 0xFFFFFF], [-1, -1]];
 	var bgColorsArr = [ [0, 0x000000], [1, 0x555555], [2, 0xAAAAAA], [3, 0x0000FF], [4, 0x00AA00], [5, 0xFFFFFF] , [-1, -1]];
 	
 	function checkBool(b) {
@@ -40,10 +41,10 @@ class ClockJxView extends Ui.WatchFace {
 		return n.toNumber();
 	}
 	
-	function checkColor(c, arr) {
+	function checkColor(c, arr, defcolor) {
 		var n;
 		if (c == null) {
-			return arr[0][1];
+			return defcolor;
 		}
 		n = c.toNumber();
 		for (var i = 0; arr[i][0] != -1; i = i + 1) {
@@ -51,7 +52,7 @@ class ClockJxView extends Ui.WatchFace {
 				return arr[i][1];
 			}
 		}
-		return arr[0][1];
+		return defcolor;
 	}
 	
 	function getSettings() {
@@ -77,12 +78,17 @@ class ClockJxView extends Ui.WatchFace {
         	}			
     	}
     	image_num = new_image_num;
-       	fgcolor = checkColor(App.getApp().getProperty("ForegroundColor"), fgColorsArr);
-       	bgcolor = checkColor(App.getApp().getProperty("BackgroundColor"), bgColorsArr);
+       	fgcolor = checkColor(App.getApp().getProperty("ForegroundColor"), fgColorsArr, Gfx.COLOR_WHITE);
+       	bgcolor = checkColor(App.getApp().getProperty("BackgroundColor"), bgColorsArr, Gfx.COLOR_BLACK);
     	if (fgcolor == Gfx.COLOR_WHITE && bgcolor == Gfx.COLOR_BLACK && image_num == 0) {
     		hash_color = Gfx.COLOR_LT_GRAY;
     	} else {
     		hash_color = fgcolor;
+    	}
+    	if (checkBool(App.getApp().getProperty("UseBackgroundColorWithImage"))) {
+    		bgcolor_with_image = bgcolor;
+    	} else {
+    		bgcolor_with_image = Gfx.COLOR_TRANSPARENT;
     	}
 	}
 
@@ -305,21 +311,33 @@ class ClockJxView extends Ui.WatchFace {
 			if (Battery < battery_limit2) {
 				dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_RED);
         	} else if (highaltide) {
-				dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);        
+        		if (image_num != 0) {
+					dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_BLACK);
+				} else {
+					dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
+				}        
 			} else {
-				dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
+				if (image_num != 0) {
+					dc.setColor(fgcolor, bgcolor_with_image);
+				} else {
+					dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
+				}
 			}
 			if (digital_clock) {
-				dc.drawText(width/2,base_up-dim,Gfx.FONT_TINY, altitudeStr, Gfx.TEXT_JUSTIFY_CENTER);
+				dc.drawText(width/2,base_up-dim-1,Gfx.FONT_TINY, altitudeStr, Gfx.TEXT_JUSTIFY_CENTER);
 			} else {
-        		dc.drawText(width/2,(height/4),Gfx.FONT_TINY, altitudeStr, Gfx.TEXT_JUSTIFY_CENTER);
+        		dc.drawText(width/2,(height/4)-1,Gfx.FONT_TINY, altitudeStr, Gfx.TEXT_JUSTIFY_CENTER);
        		}
         }
         
 		// Draw date        
 		if (Battery >= battery_limit2) {
 			if (digital_clock) {
-        		dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
+        		if (image_num != 0) {
+					dc.setColor(fgcolor, bgcolor_with_image);
+				} else {
+					dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
+				}
         	} else {
         		dc.setColor(bgcolor, hash_color);
         	}
@@ -356,12 +374,16 @@ class ClockJxView extends Ui.WatchFace {
 			if (Battery < battery_limit2) {
 				dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_RED);
 			} else {
-				dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
+				if (image_num != 0) {
+					dc.setColor(fgcolor, bgcolor_with_image);
+				} else {
+					dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
+				}
 			}
 			if (digital_clock) {
-				dc.drawText(width/2,base_down,Gfx.FONT_TINY, stepsStr, Gfx.TEXT_JUSTIFY_CENTER);
+				dc.drawText(width/2,base_down-1,Gfx.FONT_TINY, stepsStr, Gfx.TEXT_JUSTIFY_CENTER);
 			} else {
-        		dc.drawText(width/2,(60*height/100),Gfx.FONT_TINY, stepsStr, Gfx.TEXT_JUSTIFY_CENTER);
+        		dc.drawText(width/2,(60*height/100)-1,Gfx.FONT_TINY, stepsStr, Gfx.TEXT_JUSTIFY_CENTER);
        		}        
         }
 
