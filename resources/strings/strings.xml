@@ -13,6 +13,7 @@
     <string id="UseBackgroundColorWithImageTitle">Background color with image</string>
     <string id="UseSystemFontTitle">System font</string>
     <string id="UseBluetoothIconTitle">Show bluetooth connection status</string>
+    <string id="UseLargeDualTimeFontTitle">Use large font for dual time with analog clock</string>
     <string id="DemoModeTitle">Test mode</string>    
 
     <string id="ColorBlack">Black</string>

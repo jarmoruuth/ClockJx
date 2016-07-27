@@ -55,6 +55,7 @@ class ClockJxView extends Ui.WatchFace {
 	var bluetooth_error_image;
 	var bluetooth_status = true;
 	var show_bluetooth_status = true;
+	var use_large_dualtime_font = false;
 	var demo = false;	// DEMO
 	
 	var ColorsArr = [ [0, 0x000000], [1, 0x555555], [2, 0xAAAAAA], [3, 0x0000FF], [4, 0x00AA00], [5, 0x00FF00] , 
@@ -173,6 +174,7 @@ class ClockJxView extends Ui.WatchFace {
 	    	bluetooth_ok_image = null;
 	    	bluetooth_error_image = null;
 	    }
+	    use_large_dualtime_font = checkBool(App.getApp().getProperty("UseLargeDualTimeFont"));
 	}
 
     function initialize() {
@@ -307,6 +309,7 @@ class ClockJxView extends Ui.WatchFace {
 		var justify_dualtime;
 		var bluetooth_x;
 		var bluetooth_y;
+		var dualtime_font = Gfx.FONT_TINY;
         
         getSettings();
 
@@ -426,6 +429,9 @@ class ClockJxView extends Ui.WatchFace {
 				if (!dualtime || !mountain_mode) {
 					fix = dim/2;
 				}
+				if (!mountain_mode && use_large_dualtime_font) {
+					dualtime_font = Gfx.FONT_SMALL;
+				}
 				base_dualtime = dim/2 + dim + 1 + fix;
 				base_altitude = dim/2 + 2 * dim + 2 - fix;
 				// CENTER
@@ -475,6 +481,9 @@ class ClockJxView extends Ui.WatchFace {
 				//		battery
 				if (!dualtime || !mountain_mode) {
 					fix = dim/2;
+				}
+				if (!mountain_mode && use_large_dualtime_font) {
+					dualtime_font = Gfx.FONT_SMALL;
 				}
 				base_dualtime = dim + 1 + fix;
 				base_altitude = 2 * dim + 2 - fix;
@@ -627,7 +636,7 @@ class ClockJxView extends Ui.WatchFace {
 					dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
 				}
 			}
-        	dc.drawText(pos_dualtime,base_dualtime,Gfx.FONT_TINY, timeStr, justify_dualtime);        
+        	dc.drawText(pos_dualtime,base_dualtime,dualtime_font, timeStr, justify_dualtime);        
 		} 
 
 		// Draw Steps        
@@ -701,7 +710,7 @@ class ClockJxView extends Ui.WatchFace {
 					ampmStr = "PM";
 				}
 			}
-			if (clockTime.hour < 10) {
+			if (hour < 10) {
 				timeStr = Lang.format("0$1$:", [hour]);
 			} else {
 				timeStr = Lang.format("$1$:", [hour]);
