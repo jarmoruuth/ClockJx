@@ -298,6 +298,7 @@ class ClockJxView extends Ui.WatchFace {
         var center;
         var analog_num_dim = null;
 		var base_date;
+		var base_ampm;
 		var base_altitude;
 		var base_battery;
 		var base_steps;
@@ -414,6 +415,7 @@ class ClockJxView extends Ui.WatchFace {
 				//bluetooth_y = base_date  + 2;
 				bluetooth_x = width / 2 - 8;
 				bluetooth_y = 1;
+				base_ampm = center + dim/2;
 			} else {
 				//	analog clock
 				// 		dualtime*
@@ -436,6 +438,7 @@ class ClockJxView extends Ui.WatchFace {
 				base_battery = height - dim/2 - 2 * dim - 2 - fix;
 				bluetooth_x = 2 * 16;
 				bluetooth_y = height / 2 - 8;
+				base_ampm = 0;
 			}
 		
 		} else {
@@ -461,7 +464,8 @@ class ClockJxView extends Ui.WatchFace {
 				base_battery = height - dim - 1 - fix;				
 				base_dualtime = height - dim - 1;	// lower left corner
 				pos_dualtime = 1;		
-				justify_dualtime = Gfx.TEXT_JUSTIFY_LEFT;		
+				justify_dualtime = Gfx.TEXT_JUSTIFY_LEFT;	
+				base_ampm = center + dim/2;	
 			} else {
 				//	analog clock
 				// 	bt	dualtime*
@@ -482,6 +486,7 @@ class ClockJxView extends Ui.WatchFace {
 				}
 				base_steps = height - 3 * dim - 3;
 				base_battery = height - 2 * dim - 2 - fix;
+				base_ampm = 0;
 			}
 			bluetooth_x = 0;
 			bluetooth_y = 0;
@@ -583,6 +588,22 @@ class ClockJxView extends Ui.WatchFace {
 			} else if (hour < 0) {
 				hour = 24 + hour;
 			}
+			
+			var use24hclock;
+			var ampmStr = "AM";
+			
+			use24hclock = Sys.getDeviceSettings().is24Hour;
+			if (!use24hclock) {
+				if (hour > 12) {
+					hour = hour - 12;
+					ampmStr = "PM";
+				}
+				if (hour == 0) {
+					hour = 12;
+					ampmStr = "PM";
+				}
+			}			
+			
 			if (hour < 10) {
 				timeStr = Lang.format(" 0$1$:", [hour]);
 			} else {
@@ -592,6 +613,9 @@ class ClockJxView extends Ui.WatchFace {
 				timeStr = timeStr + Lang.format("0$1$ ", [clockTime.min]);
 			} else {
 				timeStr = timeStr + Lang.format("$1$ ", [clockTime.min]);
+			}
+			if (!use24hclock) {
+				timeStr = timeStr + " " + ampmStr; 
 			}
 			
 			if (Battery < battery_limit2) {
@@ -661,11 +685,26 @@ class ClockJxView extends Ui.WatchFace {
 			var textdimarr;
 			var textx;
 			var texty;
+			var use24hclock;
+			var hour;
+			var ampmStr = "AM";
 			
+			use24hclock = Sys.getDeviceSettings().is24Hour;
+			hour = clockTime.hour;
+			if (!use24hclock) {
+				if (hour > 12) {
+					hour = hour - 12;
+					ampmStr = "PM";
+				}
+				if (hour == 0) {
+					hour = 12;
+					ampmStr = "PM";
+				}
+			}
 			if (clockTime.hour < 10) {
-				timeStr = Lang.format("0$1$:", [clockTime.hour]);
+				timeStr = Lang.format("0$1$:", [hour]);
 			} else {
-				timeStr = Lang.format("$1$:", [clockTime.hour]);
+				timeStr = Lang.format("$1$:", [hour]);
 			}
 			if (clockTime.min < 10) {
 				timeStr = timeStr + Lang.format("0$1$", [clockTime.min]);
@@ -687,6 +726,9 @@ class ClockJxView extends Ui.WatchFace {
          	} else {
          		dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
          		dc.drawText(textx, texty, digital_clock_font, timeStr, Gfx.TEXT_JUSTIFY_LEFT);
+         	}
+         	if (!use24hclock) {
+         		dc.drawText(width/2 + height/2 - 4,(height/2)-(dim/2),Gfx.FONT_TINY, ampmStr, Gfx.TEXT_JUSTIFY_RIGHT);
          	}
         } else {
         	var hour_hand_length;

@@ -40,3 +40,4 @@ Version history;
 1.0.8 Small fixes.
 1.0.9 Fixed analog clock. Now it shows the real time and not a fixed test time :-)
 1.1.1 Added support for dual time and bluetooth connect status. Changes to analog watch face.
+1.1.2 Time display now uses 12/24 hour format depending on the system settings.
