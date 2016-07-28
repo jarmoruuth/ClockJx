@@ -7,6 +7,15 @@ using Toybox.Time.Gregorian as Calendar;
 using Toybox.Activity as Act;
 using Toybox.ActivityMonitor as ActMonitor;
 
+// I have used the following sources for the development of this watch face:
+//	- Garmid SDK samples
+// 	- Very nice blog post from Aaron Boman 
+//		http://blog.aaronboman.com/programming/connectiq/2014/11/11/making-an-analog-watch-face/
+//	- Several informative posts in Connect IQ forums
+//		Custom fonts: https://forums.garmin.com/showthread.php?338498-Using-Custom-Fonts
+//		Many others I cannot find any more
+//	- Some other sources I cannot remember any more
+//
 // Misc notes
 //
 // fonts
@@ -28,6 +37,7 @@ using Toybox.ActivityMonitor as ActMonitor;
 // 
 // add the font to the resources.xml file and add "font=@Fonts.id_konqa32_hd" 
 // to layout file label definitions
+//
 
 class ClockJxView extends Ui.WatchFace {
 
