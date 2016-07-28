@@ -3,6 +3,7 @@ using Toybox.Graphics as Gfx;
 using Toybox.System as Sys;
 using Toybox.Lang as Lang;
 using Toybox.Application as App;
+using Toybox.Time as Time;
 using Toybox.Time.Gregorian as Calendar;
 using Toybox.Activity as Act;
 using Toybox.ActivityMonitor as ActMonitor;
@@ -320,6 +321,8 @@ class ClockJxView extends Ui.WatchFace {
 		var bluetooth_x;
 		var bluetooth_y;
 		var dualtime_font = Gfx.FONT_TINY;
+		var now_hour;
+		var now_min;
         
         getSettings();
 
@@ -328,6 +331,9 @@ class ClockJxView extends Ui.WatchFace {
         
         var now = Time.now();
         var info = Calendar.info(now, Time.FORMAT_LONG);
+        
+        now_hour = info.hour;
+		now_min = info.min;
 
 		if (digital_clock) {
         	dateStr = Lang.format(" $1$ $2$ $3$ ", [info.day_of_week, info.month, info.day]);
@@ -354,7 +360,7 @@ class ClockJxView extends Ui.WatchFace {
 			}
 			analog_num_dim = dc.getFontHeight(font);
 			dim = analog_num_dim;
-			hour = clockTime.hour;
+			hour = now_hour;
 			if (hour >= 12 && Use24hFormat) {
 				if (Battery >= battery_limit2) {
 					dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
@@ -593,48 +599,54 @@ class ClockJxView extends Ui.WatchFace {
         if (digital_clock) {
         	dc.drawText(width/2,base_date,Gfx.FONT_TINY, dateStr, Gfx.TEXT_JUSTIFY_CENTER);
         } else {
-	        dc.drawText(width/2 + height/2 - 4,(height/2)-(dim/2),Gfx.FONT_TINY, dateStr, Gfx.TEXT_JUSTIFY_RIGHT);
+	        dc.drawText(width - 4, (height/2)-(dim/2), Gfx.FONT_TINY, dateStr, Gfx.TEXT_JUSTIFY_RIGHT);
 	  	}
 	  	
 		// Draw dual time
 		if (dualtime) {
 			var timeStr;
-			var hour = clockTime.hour - clockTime.timeZoneOffset/3600;
+			var dthour;
+			var dtmin;
 			
-			hour = hour + dualtimeTZ;
-			if (hour > 24) {
-				hour = hour - 24;
-			} else if (hour < 0) {
-				hour = 24 + hour;
-			}
+			var dtnow = now;
+			// adjust to UTC/GMT
+			dtnow = dtnow.add(new Time.Duration(-clockTime.timeZoneOffset));
+			// adjust to time zone
+			dtnow = dtnow.add(new Time.Duration(dualtimeTZ));
+
+			// create a time info object
+			var dtinfo = Calendar.info(dtnow, Time.FORMAT_LONG);
+			
+			dthour = dtinfo.hour;
+			dtmin = dtinfo.min;
 			
 			var use24hclock;
-			var ampmStr = "AM";
+			var ampmStr = "am ";
 			
 			use24hclock = Sys.getDeviceSettings().is24Hour;
 			if (!use24hclock) {
-				if (hour > 12) {
-					hour = hour - 12;
-					ampmStr = "PM";
+				if (dthour >= 12) {
+					dthour = dthour - 12;
+					ampmStr = "pm ";
 				}
-				if (hour == 0) {
-					hour = 12;
-					ampmStr = "PM";
+				if (dthour == 0) {
+					dthour = 12;
+					ampmStr = "am ";
 				}
 			}			
 			
-			if (hour < 10) {
-				timeStr = Lang.format(" 0$1$:", [hour]);
+			if (dthour < 10) {
+				timeStr = Lang.format(" 0$1$:", [dthour]);
 			} else {
-				timeStr = Lang.format(" $1$:", [hour]);
+				timeStr = Lang.format(" $1$:", [dthour]);
 			}
-			if (clockTime.min < 10) {
-				timeStr = timeStr + Lang.format("0$1$ ", [clockTime.min]);
+			if (dtmin < 10) {
+				timeStr = timeStr + Lang.format("0$1$ ", [dtmin]);
 			} else {
-				timeStr = timeStr + Lang.format("$1$ ", [clockTime.min]);
+				timeStr = timeStr + Lang.format("$1$ ", [dtmin]);
 			}
 			if (!use24hclock) {
-				timeStr = timeStr + " " + ampmStr; 
+				timeStr = timeStr + ampmStr; 
 			}
 			
 			if (Battery < battery_limit2) {
@@ -709,15 +721,15 @@ class ClockJxView extends Ui.WatchFace {
 			var ampmStr = "AM";
 			
 			use24hclock = Sys.getDeviceSettings().is24Hour;
-			hour = clockTime.hour;
+			hour = now_hour;
 			if (!use24hclock) {
-				if (hour > 12) {
+				if (hour >= 12) {
 					hour = hour - 12;
 					ampmStr = "PM";
 				}
 				if (hour == 0) {
 					hour = 12;
-					ampmStr = "PM";
+					ampmStr = "AM";
 				}
 			}
 			if (hour < 10) {
@@ -725,10 +737,10 @@ class ClockJxView extends Ui.WatchFace {
 			} else {
 				timeStr = Lang.format("$1$:", [hour]);
 			}
-			if (clockTime.min < 10) {
-				timeStr = timeStr + Lang.format("0$1$", [clockTime.min]);
+			if (now_min < 10) {
+				timeStr = timeStr + Lang.format("0$1$", [now_min]);
 			} else {
-				timeStr = timeStr + Lang.format("$1$", [clockTime.min]);
+				timeStr = timeStr + Lang.format("$1$", [now_min]);
 			}
 			textdimarr = dc.getTextDimensions(timeStr, digital_clock_font);
 			textx = width/2 - textdimarr[0]/2;
@@ -747,7 +759,7 @@ class ClockJxView extends Ui.WatchFace {
          		dc.drawText(textx, texty, digital_clock_font, timeStr, Gfx.TEXT_JUSTIFY_LEFT);
          	}
          	if (!use24hclock) {
-         		dc.drawText(width/2 + height/2 - 4,(height/2)-(dim/2),Gfx.FONT_TINY, ampmStr, Gfx.TEXT_JUSTIFY_RIGHT);
+         		dc.drawText(width - 4,(height/2)-(dim/2),Gfx.FONT_TINY, ampmStr, Gfx.TEXT_JUSTIFY_RIGHT);
          	}
         } else {
         	var hour_hand_length;
@@ -767,8 +779,8 @@ class ClockJxView extends Ui.WatchFace {
 	        	       
 	        // Draw the hour. Convert it to minutes and
 	        // compute the angle.
-			var clock_hour = clockTime.hour;
-			var clock_min = clockTime.min;
+			var clock_hour = now_hour;
+			var clock_min = now_min;
 			if (demo) {
 				clock_hour = 10;	// DEMO
 				clock_min = 12;		// DEMO

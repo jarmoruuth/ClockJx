@@ -50,7 +50,47 @@
     </setting>
 
     <setting propertyKey="@Properties.DualTimeTZ" title="@Strings.DualTimeTZ">
-        <settingConfig type="numeric" required="true" min="-12" max="12" />
+        <settingConfig type="list">
+			<listEntry value="-43200">@Strings.TZValm1200</listEntry>
+			<listEntry value="-39600">@Strings.TZValm1100</listEntry>
+			<listEntry value="-36000">@Strings.TZValm1000</listEntry>
+			<listEntry value="-32400">@Strings.TZValm900</listEntry>
+			<listEntry value="-34200">@Strings.TZValm930</listEntry>
+			<listEntry value="-28800">@Strings.TZValm800</listEntry>
+			<listEntry value="-25200">@Strings.TZValm700</listEntry>
+			<listEntry value="-21600">@Strings.TZValm600</listEntry>
+			<listEntry value="-18000">@Strings.TZValm500</listEntry>
+			<listEntry value="-14400">@Strings.TZValm400</listEntry>
+			<listEntry value="-12600">@Strings.TZValm330</listEntry>
+			<listEntry value="-10800">@Strings.TZValm300</listEntry>
+			<listEntry value="-7200">@Strings.TZValm200</listEntry>
+			<listEntry value="-3600">@Strings.TZValm100</listEntry>
+			<listEntry value="0">@Strings.TZVal000</listEntry>
+			<listEntry value="3600">@Strings.TZVal100</listEntry>
+			<listEntry value="7200">@Strings.TZVal200</listEntry>
+			<listEntry value="10800">@Strings.TZVal300</listEntry>
+			<listEntry value="12600">@Strings.TZVal330</listEntry>
+			<listEntry value="14400">@Strings.TZVal400</listEntry>
+			<listEntry value="16200">@Strings.TZVal430</listEntry>
+			<listEntry value="18000">@Strings.TZVal500</listEntry>
+			<listEntry value="19800">@Strings.TZVal530</listEntry>
+			<listEntry value="20700">@Strings.TZVal545</listEntry>
+			<listEntry value="21600">@Strings.TZVal600</listEntry>
+			<listEntry value="23400">@Strings.TZVal630</listEntry>
+			<listEntry value="25200">@Strings.TZVal700</listEntry>
+			<listEntry value="28800">@Strings.TZVal800</listEntry>
+			<listEntry value="30600">@Strings.TZVal830</listEntry>
+			<listEntry value="31500">@Strings.TZVal845</listEntry>
+			<listEntry value="32400">@Strings.TZVal900</listEntry>
+			<listEntry value="34200">@Strings.TZVal930</listEntry>
+			<listEntry value="36000">@Strings.TZVal1000</listEntry>
+			<listEntry value="37800">@Strings.TZVal1030</listEntry>
+			<listEntry value="39600">@Strings.TZVal1100</listEntry>
+			<listEntry value="43200">@Strings.TZVal1200</listEntry>
+			<listEntry value="45900">@Strings.TZVal1245</listEntry>
+			<listEntry value="46800">@Strings.TZVal1300</listEntry>
+			<listEntry value="50400">@Strings.TZVal1400</listEntry>        	
+        </settingConfig>
     </setting>
 
     <setting propertyKey="@Properties.DigitalClock" title="@Strings.DigitalClockTitle">
