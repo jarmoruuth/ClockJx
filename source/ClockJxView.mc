@@ -446,7 +446,7 @@ class ClockJxView extends Ui.WatchFace {
 					fix = dim/2;
 				}
 				if (!mountain_mode && use_large_dualtime_font) {
-					dualtime_font = Gfx.FONT_SMALL;
+					dualtime_font = Gfx.FONT_MEDIUM;
 				}
 				base_dualtime = dim/2 + dim + 1 + fix;
 				base_altitude = dim/2 + 2 * dim + 2 - fix;
