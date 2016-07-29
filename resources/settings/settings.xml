@@ -93,6 +93,16 @@
         </settingConfig>
     </setting>
 
+   <setting propertyKey="@Properties.DualTimeDST" title="@Strings.DualTimeDST">
+        <settingConfig type="list">
+			<listEntry value="-3600">@Strings.DSTValm100</listEntry>
+			<listEntry value="0">@Strings.DSTVal000</listEntry>
+			<listEntry value="1800">@Strings.DSTVal030</listEntry>
+			<listEntry value="3600">@Strings.DSTVal100</listEntry>
+			<listEntry value="-1">@Strings.DSTValCurrent</listEntry>
+        </settingConfig>
+    </setting>
+
     <setting propertyKey="@Properties.DigitalClock" title="@Strings.DigitalClockTitle">
         <settingConfig type="boolean" />
     </setting>

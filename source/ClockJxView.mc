@@ -62,6 +62,7 @@ class ClockJxView extends Ui.WatchFace {
 	var use_system_font = false;
 	var dualtime = false;
 	var dualtimeTZ = 0;
+	var dualtimeDST = 0;
 	var bluetooth_ok_image;
 	var bluetooth_error_image;
 	var bluetooth_status = true;
@@ -117,6 +118,7 @@ class ClockJxView extends Ui.WatchFace {
 		steps = checkBool(App.getApp().getProperty("Steps"));
 		dualtime = checkBool(App.getApp().getProperty("UseDualTime"));
 		dualtimeTZ = checkNumber(App.getApp().getProperty("DualTimeTZ"));
+		dualtimeDST = checkNumber(App.getApp().getProperty("DualTimeDST"));
 
 		new_use_system_font = checkBool(App.getApp().getProperty("UseSystemFont"));
 		if (dualtime && screen_shape != Sys.SCREEN_SHAPE_ROUND) {
@@ -613,6 +615,20 @@ class ClockJxView extends Ui.WatchFace {
 			dtnow = dtnow.add(new Time.Duration(-clockTime.timeZoneOffset));
 			// adjust to time zone
 			dtnow = dtnow.add(new Time.Duration(dualtimeTZ));
+			
+			if (dualtimeDST != 0) {
+				// calculate Daylight Savings Time (DST)
+				var dtDST;
+				if (dualtimeDST == -1) {
+					// Use the current dst value
+					dtDST = clockTime.dst;
+				} else {
+					// Use the configured DST value
+					dtDST = dualtimeDST; 
+				}
+				// adjust DST
+				dtnow = dtnow.add(new Time.Duration(dtDST));
+			}
 
 			// create a time info object
 			var dtinfo = Calendar.info(dtnow, Time.FORMAT_LONG);
@@ -626,10 +642,11 @@ class ClockJxView extends Ui.WatchFace {
 			use24hclock = Sys.getDeviceSettings().is24Hour;
 			if (!use24hclock) {
 				if (dthour >= 12) {
-					dthour = dthour - 12;
 					ampmStr = "pm ";
 				}
-				if (dthour == 0) {
+				if (dthour > 12) {
+					dthour = dthour - 12;				
+				} else if (dthour == 0) {
 					dthour = 12;
 					ampmStr = "am ";
 				}
@@ -724,10 +741,11 @@ class ClockJxView extends Ui.WatchFace {
 			hour = now_hour;
 			if (!use24hclock) {
 				if (hour >= 12) {
-					hour = hour - 12;
 					ampmStr = "PM";
 				}
-				if (hour == 0) {
+				if (hour > 12) {
+					hour = hour - 12;				
+				} else if (hour == 0) {
 					hour = 12;
 					ampmStr = "AM";
 				}
