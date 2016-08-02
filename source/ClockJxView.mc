@@ -47,8 +47,8 @@ class ClockJxView extends Ui.WatchFace {
 	var bgcolor;
 	var hash_color;
 	var font;
-	var battery_limit1 = 50;
-	var battery_limit2 = 25;
+	var battery_limit_low = 50;
+	var battery_limit_critical = 25;
 	var background;
 	var image_num = 0;
 	var mountain_mode;
@@ -83,6 +83,13 @@ class ClockJxView extends Ui.WatchFace {
 	function checkNumber(n) {
 		if (n == null) {
 			return 0;
+		} 
+		return n.toNumber();
+	}
+	
+	function checkNumberDef(n, def) {
+		if (n == null) {
+			return def;
 		} 
 		return n.toNumber();
 	}
@@ -188,6 +195,8 @@ class ClockJxView extends Ui.WatchFace {
 	    	bluetooth_error_image = null;
 	    }
 	    use_large_dualtime_font = checkBool(App.getApp().getProperty("UseLargeDualTimeFont"));
+	    battery_limit_low = checkNumberDef(App.getApp().getProperty("BatteryWarningLimitLow"), 50);
+	    battery_limit_critical = checkNumberDef(App.getApp().getProperty("BatteryWarningLimitCritical"), 25);
 	}
 
     function initialize() {
@@ -364,7 +373,7 @@ class ClockJxView extends Ui.WatchFace {
 			dim = analog_num_dim;
 			hour = now_hour;
 			if (hour >= 12 && Use24hFormat) {
-				if (Battery >= battery_limit2) {
+				if (Battery >= battery_limit_critical) {
 					dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
 				} else {
 					dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
@@ -377,13 +386,13 @@ class ClockJxView extends Ui.WatchFace {
 	        	dc.drawText(width/2,height-dim,font,"18", Gfx.TEXT_JUSTIFY_CENTER);
 	        	dc.drawText(width/2-height/2+4,(height/2)-(dim/2)-4,font,"21",Gfx.TEXT_JUSTIFY_LEFT);
 	        } else {
-	        	if (Battery >= battery_limit2) {
+	        	if (Battery >= battery_limit_critical) {
 					dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
 				} else {
 					dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
 				}
 	        	dc.drawText((width/2),0,font,"12",Gfx.TEXT_JUSTIFY_CENTER);
-	        	if (Battery >= battery_limit2) {
+	        	if (Battery >= battery_limit_critical) {
 	        		dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
 	        	}
 	        	//dc.drawText(width-5,height/2-15,font,"3", Gfx.TEXT_JUSTIFY_RIGHT);
@@ -566,7 +575,7 @@ class ClockJxView extends Ui.WatchFace {
 				altitudeStr = altitudeStr + " ft ";
 			}
 
-			if (Battery < battery_limit2) {
+			if (Battery < battery_limit_critical) {
 				dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_RED);
         	} else if (highaltide) {
         		if (image_num != 0) {
@@ -585,7 +594,7 @@ class ClockJxView extends Ui.WatchFace {
         }
         
 		// Draw date        
-		if (Battery >= battery_limit2) {
+		if (Battery >= battery_limit_critical) {
 			if (digital_clock) {
         		if (image_num != 0) {
 					dc.setColor(fgcolor, bgcolor_with_image);
@@ -666,7 +675,7 @@ class ClockJxView extends Ui.WatchFace {
 				timeStr = timeStr + ampmStr; 
 			}
 			
-			if (Battery < battery_limit2) {
+			if (Battery < battery_limit_critical) {
 				dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_RED);
 			} else {
 				if (image_num != 0) {
@@ -703,7 +712,7 @@ class ClockJxView extends Ui.WatchFace {
 				stepsStr = Lang.format(" $1$ steps ", [actsteps]);			
 			}
 
-			if (Battery < battery_limit2) {
+			if (Battery < battery_limit_critical) {
 				dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_RED);
 			} else {
 				if (image_num != 0) {
@@ -718,11 +727,14 @@ class ClockJxView extends Ui.WatchFace {
         // Draw battery
 		var battery_bgcolor;
 		battery_bgcolor = Gfx.COLOR_BLACK;
-		if (Battery >= battery_limit1) { 
+		if (Battery >= battery_limit_low) { 
+			// Normal battery status
 			dc.setColor(Gfx.COLOR_GREEN, battery_bgcolor);
-		} else if (Battery >= battery_limit2) {
+		} else if (Battery >= battery_limit_critical) {
+			// Low battery status
 			dc.setColor(Gfx.COLOR_ORANGE, battery_bgcolor);		
 		} else {
+			// Critical battery status
 			dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_BLACK);		
 		}
         dc.drawText(width/2,base_battery,Gfx.FONT_TINY, BatteryStr, Gfx.TEXT_JUSTIFY_CENTER);

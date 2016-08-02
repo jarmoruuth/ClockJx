@@ -15,7 +15,8 @@ Other configuration options are:
 - ClockJx default font or system font for digital time display
 - Bluetooth status display
 - Dual time daylight savings time offset
-- Bigger dual time font size with analog clock when altitude is not didplayed.
+- Bigger dual time font size with analog clock when altitude is not displayed
+- Low and critical battery warning levels
 
 Always visible on the clock screen are:
 
@@ -46,3 +47,4 @@ Version history;
       for dual time.
 1.1.3 Build using latest SDK 1.2.11 to fix a problem with dual time. Changed the bigger dual time font to a bigger one.
 1.1.4 Added configurable dual time daylight savings time offset, fixed problems in am/pm shown incorrectly.
+1.1.5 Added configurable low and critical battery warning levels.

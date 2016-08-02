@@ -131,10 +131,18 @@
         <settingConfig type="boolean" />
     </setting>
 
-<setting propertyKey="@Properties.UseLargeDualTimeFont" title="@Strings.UseLargeDualTimeFontTitle">
+	<setting propertyKey="@Properties.UseLargeDualTimeFont" title="@Strings.UseLargeDualTimeFontTitle">
         <settingConfig type="boolean" />
     </setting>
 
+	<setting propertyKey="@Properties.BatteryWarningLimitLow" title="@Strings.BatteryWarningLimitLowTitle">
+        <settingConfig type="numeric" required="true" min="0" max="99" />
+    </setting>
+    
+    <setting propertyKey="@Properties.BatteryWarningLimitCritical" title="@Strings.BatteryWarningLimitCriticalTitle">
+        <settingConfig type="numeric" required="true" min="0" max="99" />
+    </setting>
+    
     <setting propertyKey="@Properties.DemoMode" title="@Strings.DemoModeTitle">
         <settingConfig type="boolean" />
     </setting>
