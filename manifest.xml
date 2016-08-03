@@ -2,8 +2,6 @@
     <iq:application entry="ClockJxApp" id="5455313B150A4A7F8A07A82B2EEFA76A" launcherIcon="@Drawables.LauncherIcon" name="@Strings.AppName" type="watchface">
 
         <iq:products>
-            <iq:product id="square_watch"/>
-            <iq:product id="round_watch"/>
             <iq:product id="fenix3"/>
             <iq:product id="fenix3_hr"/>
             <iq:product id="d2bravo"/>
