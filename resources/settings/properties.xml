@@ -1,6 +1,6 @@
 <properties>
 
-	<property id="appVersion" type="string">1.1.5</property>
+	<property id="appVersion" type="string">1.1.6</property>
     <property id="BackgroundColor" type="number">0x000000</property>
     <property id="ForegroundColor" type="number">0xFFFFFF</property>
     <property id="BackgroundImage" type="number">0</property>  
@@ -17,6 +17,7 @@
     <property id="UseLargeDualTimeFont" type="boolean">false</property>
     <property id="BatteryWarningLimitLow" type="number">50</property>
     <property id="BatteryWarningLimitCritical" type="number">25</property>
+    <property id="BatteryBackgroundColor" type="number">0x123456</property>
     <property id="DemoMode" type="boolean">false</property>
 
 </properties>

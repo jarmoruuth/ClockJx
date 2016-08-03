@@ -42,6 +42,7 @@
   	
   	<string id="BatteryWarningLimitLowTitle">Battery warning limit low</string>
   	<string id="BatteryWarningLimitCriticalTitle">Battery warning limit critical</string>
+  	<string id="BatteryBackgroundColorTitle">Battery background Color</string>
   	
   	<string id="DSTValm100">-1:00</string>
   	<string id="DSTVal000">0:00</string>

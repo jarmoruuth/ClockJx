@@ -49,6 +49,7 @@ class ClockJxView extends Ui.WatchFace {
 	var font;
 	var battery_limit_low = 50;
 	var battery_limit_critical = 25;
+	var battery_background_color = 0x000000;
 	var background;
 	var image_num = 0;
 	var mountain_mode;
@@ -197,6 +198,13 @@ class ClockJxView extends Ui.WatchFace {
 	    use_large_dualtime_font = checkBool(App.getApp().getProperty("UseLargeDualTimeFont"));
 	    battery_limit_low = checkNumberDef(App.getApp().getProperty("BatteryWarningLimitLow"), 50);
 	    battery_limit_critical = checkNumberDef(App.getApp().getProperty("BatteryWarningLimitCritical"), 25);
+	    battery_background_color = checkNumberDef(App.getApp().getProperty("BatteryBackgroundColor"), Gfx.COLOR_TRANSPARENT);
+	    if (battery_background_color == 0x123456) {
+	    	// None
+	    	battery_background_color = Gfx.COLOR_TRANSPARENT;
+	    } else {
+	    	battery_background_color = checkColor(battery_background_color, Gfx.COLOR_TRANSPARENT);
+	    }
 	}
 
     function initialize() {
@@ -725,14 +733,12 @@ class ClockJxView extends Ui.WatchFace {
         }
 
         // Draw battery
-		var battery_bgcolor;
-		battery_bgcolor = Gfx.COLOR_BLACK;
 		if (Battery >= battery_limit_low) { 
 			// Normal battery status
-			dc.setColor(Gfx.COLOR_GREEN, battery_bgcolor);
+			dc.setColor(Gfx.COLOR_GREEN, battery_background_color);
 		} else if (Battery >= battery_limit_critical) {
 			// Low battery status
-			dc.setColor(Gfx.COLOR_ORANGE, battery_bgcolor);		
+			dc.setColor(Gfx.COLOR_ORANGE, battery_background_color);		
 		} else {
 			// Critical battery status
 			dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_BLACK);		

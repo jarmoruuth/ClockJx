@@ -143,6 +143,22 @@
         <settingConfig type="numeric" required="true" min="0" max="99" />
     </setting>
     
+    <setting propertyKey="@Properties.BatteryBackgroundColor" title="@Strings.BatteryBackgroundColorTitle">
+        <settingConfig type="list">
+            <listEntry value="0x000000">@Strings.ColorBlack</listEntry>        
+            <listEntry value="0x555555">@Strings.ColorDarkGray</listEntry>
+            <listEntry value="0xAAAAAA">@Strings.ColorLightGray</listEntry>
+            <listEntry value="0x0000FF">@Strings.ColorDarkBlue</listEntry>
+            <listEntry value="0x00AA00">@Strings.ColorDarkGreen</listEntry>
+            <listEntry value="0x00FF00">@Strings.ColorGreen</listEntry>
+            <listEntry value="0xFF5500">@Strings.ColorOrange</listEntry>
+            <listEntry value="0xFFAA00">@Strings.ColorYellow</listEntry>                        
+            <listEntry value="0xFFFFFF">@Strings.ColorWhite</listEntry>
+            <listEntry value="0x123456">@Strings.BgImgNone</listEntry>            
+        </settingConfig>
+    </setting>    
+    
+    
     <setting propertyKey="@Properties.DemoMode" title="@Strings.DemoModeTitle">
         <settingConfig type="boolean" />
     </setting>
