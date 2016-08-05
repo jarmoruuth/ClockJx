@@ -28,13 +28,13 @@
     <string id="ColorDarkGreen">Dark Green</string>    
     
     <string id="BgImgNone">None</string>     
-    <string id="BgImg1">1</string>
-    <string id="BgImg2">2</string>
-    <string id="BgImg3">3</string>
-    <string id="BgImg4">4</string>           
-    <string id="BgImg5">5</string>
-    <string id="BgImg6">6</string>
-    <string id="BgImg7">7</string>
+    <string id="BgImg1">Tracks Haute Route</string>
+    <string id="BgImg2">Tracks Oukaimeden</string>
+    <string id="BgImg3">Mer de Glace Chamonix</string>
+    <string id="BgImg4">Peaks Chamonix</string>           
+    <string id="BgImg5">Tracks Alpe d'Huez</string>
+    <string id="BgImg6">Skier Les Arcs</string>
+    <string id="BgImg7">Grandes Jorasses Chamonix</string>
     
   	<string id="DualTime">Dual time</string>
   	<string id="DualTimeTZ">Time zone for dual time</string>

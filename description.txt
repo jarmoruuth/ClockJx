@@ -29,6 +29,8 @@ Normally battery status is show with a green color. If battery goes below low ba
 
 If bluetooth status is shown then an active connection is shown with a blue bluetooth icon. If connection is not active it is shown with a red bluetooth icon.
 
+Photos Copyright © 1996-2015 Jarmo Ruuth and Jari Arkko
+
 CONFIGURATION
 
 Configuration works from a mobile phone or from Garmin express. You cannot configure directly from a Garmin device like you can do with a built in watch face. In the mobile phone you need to go to watch face section and select the installed ClockJx watch face. Then you can select settings and change them there. Configuration requires the Garmin device firmware with Connect IQ version 1.2.
