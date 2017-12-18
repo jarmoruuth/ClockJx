@@ -9,9 +9,7 @@
             <iq:product id="epix"/>
         </iq:products>
 
-        <iq:permissions>
-            <iq:uses-permission id="Steps"/>
-        </iq:permissions>
+        <iq:permissions/>
 
         <iq:languages>
             <iq:language>eng</iq:language>
