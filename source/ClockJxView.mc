@@ -16,6 +16,7 @@ using Toybox.ActivityMonitor as ActMonitor;
 //		Custom fonts: https://forums.garmin.com/showthread.php?338498-Using-Custom-Fonts
 //		Many others I cannot find any more
 //	- Some other sources I cannot remember any more
+// This updated from original Fenix 3 version
 //
 // Misc notes
 //
@@ -47,48 +48,43 @@ class ClockJxView extends Ui.WatchFace {
 	var bgcolor;
 	var hash_color;
 	var font;
-	var battery_limit_low = 50;
-	var battery_limit_critical = 25;
+	var battery_limit_low = 25;
+	var battery_limit_critical = 10;
 	var battery_background_color = 0x000000;
 	var background;
 	var image_num = 0;
-	var mountain_mode;
-	var Use24hFormat;
-	var digital_clock;
-	var steps;
+	var mountain_mode = false;
+	var AnalogUse24hFormat = true;
+	var digital_clock = true;
+	var steps = false;
 	var screen_shape;
 	var bgcolor_with_image;
-	var use_bgcolor_with_image = false;
+	var use_bgcolor_with_image = true;
 	var digital_clock_font;
 	var use_system_font = false;
 	var dualtime = false;
 	var dualtimeTZ = 0;
-	var dualtimeDST = 0;
+	var dualtimeDST = -1;	// current DST
 	var bluetooth_ok_image;
 	var bluetooth_error_image;
 	var bluetooth_status = true;
 	var show_bluetooth_status = true;
 	var use_large_dualtime_font = false;
+	var new_image_num = 0;
+	var new_use_system_font = false;
 	var demo = false;	// DEMO
 	
 	var ColorsArr = [ [0, 0x000000], [1, 0x555555], [2, 0xAAAAAA], [3, 0x0000FF], [4, 0x00AA00], [5, 0x00FF00] , 
-					  [6, 0xFF5500], [7, 0xFFAA00], [8, 0xFFFFFF], [-1, -1]];
+					  [6, 0xAA0000], [7, 0xFF5500], [8, 0xFFAA00], [9, 0xFFFFFF], [-1, -1]];
 	
-	function checkBool(b) {
+	function checkBool(b, def) {
 		if (b == null || (b != true && b != false)) {
-			return false;
+			return def;
 		} 
 		return b;
 	}
 	
-	function checkNumber(n) {
-		if (n == null) {
-			return 0;
-		} 
-		return n.toNumber();
-	}
-	
-	function checkNumberDef(n, def) {
+	function checkNumber(n, def) {
 		if (n == null) {
 			return def;
 		} 
@@ -110,25 +106,23 @@ class ClockJxView extends Ui.WatchFace {
 	}
 	
 	function getSettings() {
-		var new_image_num;
-		var new_use_system_font;
 		
 		if (!settingsChanged) {
 			return;
 		}
 		settingsChanged = false;
 		
-		demo = checkBool(App.getApp().getProperty("DemoMode"));
+		demo = checkBool(App.getApp().getProperty("DemoMode"), demo);
 		
-		digital_clock = checkBool(App.getApp().getProperty("DigitalClock"));
-		Use24hFormat = checkBool(App.getApp().getProperty("Use24hFormat"));
-		mountain_mode = checkBool(App.getApp().getProperty("MountainMode"));
-		steps = checkBool(App.getApp().getProperty("Steps"));
-		dualtime = checkBool(App.getApp().getProperty("UseDualTime"));
-		dualtimeTZ = checkNumber(App.getApp().getProperty("DualTimeTZ"));
-		dualtimeDST = checkNumber(App.getApp().getProperty("DualTimeDST"));
+		digital_clock = checkBool(App.getApp().getProperty("DigitalClock"), digital_clock);
+		AnalogUse24hFormat = checkBool(App.getApp().getProperty("AnalogUse24hFormat"), AnalogUse24hFormat);
+		mountain_mode = checkBool(App.getApp().getProperty("MountainMode"), mountain_mode);
+		steps = checkBool(App.getApp().getProperty("Steps"), steps);
+		dualtime = checkBool(App.getApp().getProperty("UseDualTime"), dualtime);
+		dualtimeTZ = checkNumber(App.getApp().getProperty("DualTimeTZ"), dualtimeTZ);
+		dualtimeDST = checkNumber(App.getApp().getProperty("DualTimeDST"), dualtimeDST);
 
-		new_use_system_font = checkBool(App.getApp().getProperty("UseSystemFont"));
+		new_use_system_font = checkBool(App.getApp().getProperty("UseSystemFont"), new_use_system_font);
 		if (dualtime && screen_shape != Sys.SCREEN_SHAPE_ROUND) {
 			//new_use_system_font = true;
 		}
@@ -144,7 +138,7 @@ class ClockJxView extends Ui.WatchFace {
 		//if (use_system_font && steps && dualtime && digital_clock) {
 		//	digital_clock_font = Gfx.FONT_NUMBER_THAI_HOT;
 		//}
-		new_image_num = checkNumber(App.getApp().getProperty("BackgroundImage"));
+		new_image_num = checkNumber(App.getApp().getProperty("BackgroundImage"), new_image_num);
 		if (new_image_num != image_num && new_image_num != 0) {
 			background = null;
 			if (new_image_num == 1) {
@@ -173,14 +167,14 @@ class ClockJxView extends Ui.WatchFace {
     	} else {
     		hash_color = fgcolor;
     	}
-    	if (checkBool(App.getApp().getProperty("UseBackgroundColorWithImage"))) {
+    	if (checkBool(App.getApp().getProperty("UseBackgroundColorWithImage"), use_bgcolor_with_image)) {
     		bgcolor_with_image = bgcolor;
     		use_bgcolor_with_image = true;
     	} else {
     		bgcolor_with_image = Gfx.COLOR_TRANSPARENT;
     		use_bgcolor_with_image = false;
     	}
-    	show_bluetooth_status = checkBool(App.getApp().getProperty("UseBluetoothIcon"));
+    	show_bluetooth_status = checkBool(App.getApp().getProperty("UseBluetoothIcon"), show_bluetooth_status);
     	if (show_bluetooth_status) {
 	    	if (demo) {
 	    		bluetooth_status = !bluetooth_status;
@@ -195,10 +189,10 @@ class ClockJxView extends Ui.WatchFace {
 	    	bluetooth_ok_image = null;
 	    	bluetooth_error_image = null;
 	    }
-	    use_large_dualtime_font = checkBool(App.getApp().getProperty("UseLargeDualTimeFont"));
-	    battery_limit_low = checkNumberDef(App.getApp().getProperty("BatteryWarningLimitLow"), 50);
-	    battery_limit_critical = checkNumberDef(App.getApp().getProperty("BatteryWarningLimitCritical"), 25);
-	    battery_background_color = checkNumberDef(App.getApp().getProperty("BatteryBackgroundColor"), Gfx.COLOR_TRANSPARENT);
+	    use_large_dualtime_font = checkBool(App.getApp().getProperty("UseLargeDualTimeFont"), use_large_dualtime_font);
+	    battery_limit_low = checkNumber(App.getApp().getProperty("BatteryWarningLimitLow"), battery_limit_low);
+	    battery_limit_critical = checkNumber(App.getApp().getProperty("BatteryWarningLimitCritical"), battery_limit_critical);
+	    battery_background_color = checkNumber(App.getApp().getProperty("BatteryBackgroundColor"), Gfx.COLOR_TRANSPARENT);
 	    if (battery_background_color == 0x123456) {
 	    	// None
 	    	battery_background_color = Gfx.COLOR_TRANSPARENT;
@@ -370,6 +364,7 @@ class ClockJxView extends Ui.WatchFace {
         	dc.clear();
         }
         
+		var analog_24h = false;
         if (!digital_clock) { 
 	        // Draw the numbers
 			if (screen_shape == Sys.SCREEN_SHAPE_ROUND) {
@@ -380,16 +375,17 @@ class ClockJxView extends Ui.WatchFace {
 			analog_num_dim = dc.getFontHeight(font);
 			dim = analog_num_dim;
 			hour = now_hour;
-			if (hour >= 12 && Use24hFormat) {
+			if (hour >= 12 && AnalogUse24hFormat) {
+				analog_24h = true;
 				if (Battery >= battery_limit_critical) {
 					dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
 				} else {
 					dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
 				}
 	        	dc.drawText((width/2),0,font,"24",Gfx.TEXT_JUSTIFY_CENTER);
-	        	if (Battery >= battery_limit2) {
-	        		dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
-	        	}
+	        	// if (Battery >= battery_limit2) {
+	        	//	dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
+	        	//}
 	        	//dc.drawText(width-5,height/2-15,font,"15", Gfx.TEXT_JUSTIFY_RIGHT);
 	        	dc.drawText(width/2,height-dim,font,"18", Gfx.TEXT_JUSTIFY_CENTER);
 	        	dc.drawText(width/2-height/2+4,(height/2)-(dim/2)-4,font,"21",Gfx.TEXT_JUSTIFY_LEFT);
@@ -478,6 +474,9 @@ class ClockJxView extends Ui.WatchFace {
 				base_steps = height - dim/2 - 3 * dim - 3;
 				base_battery = height - dim/2 - 2 * dim - 2 - fix;
 				bluetooth_x = 2 * 16;
+				if (analog_24h) {
+					bluetooth_x  = bluetooth_x + 16;
+				}
 				bluetooth_y = height / 2 - 8;
 				base_ampm = 0;
 			}
@@ -752,7 +751,7 @@ class ClockJxView extends Ui.WatchFace {
 			var textx;
 			var texty;
 			var use24hclock;
-			var hour;
+			//var hour;
 			var ampmStr = "AM";
 			
 			use24hclock = Sys.getDeviceSettings().is24Hour;

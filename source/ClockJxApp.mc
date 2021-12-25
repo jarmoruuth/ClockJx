@@ -9,12 +9,14 @@ class ClockJxApp extends App.AppBase {
         AppBase.initialize();
     }
 
-    //! onStart() is called on application start up
-    function onStart() {
+    //! Handle app startup
+    //! @param state Startup arguments
+    public function onStart(state as Dictionary?) as Void {
     }
 
-    //! onStop() is called when your application is exiting
-    function onStop() {
+    //! Handle app shutdown
+    //! @param state Shutdown arguments
+    public function onStop(state as Dictionary?) as Void {
     }
 
     //! Return the initial view of your application here

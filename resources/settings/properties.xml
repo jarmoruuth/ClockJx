@@ -1,11 +1,11 @@
 <properties>
 
-	<property id="appVersion" type="string">1.1.6</property>
+	<property id="appVersion" type="string">1.2.0</property>
     <property id="BackgroundColor" type="number">0x000000</property>
     <property id="ForegroundColor" type="number">0xFFFFFF</property>
     <property id="BackgroundImage" type="number">0</property>  
-    <property id="DigitalClock" type="boolean">false</property>  
-    <property id="Use24hFormat" type="boolean">false</property>
+    <property id="DigitalClock" type="boolean">true</property>  
+    <property id="Use24hFormat" type="boolean">true</property>
     <property id="MountainMode" type="boolean">false</property>
     <property id="Steps" type="boolean">false</property>
     <property id="UseBackgroundColorWithImage" type="boolean">true</property>
@@ -15,8 +15,8 @@
     <property id="DualTimeDST" type="number">-1</property>
     <property id="UseBluetoothIcon" type="boolean">true</property>
     <property id="UseLargeDualTimeFont" type="boolean">false</property>
-    <property id="BatteryWarningLimitLow" type="number">50</property>
-    <property id="BatteryWarningLimitCritical" type="number">25</property>
+    <property id="BatteryWarningLimitLow" type="number">25</property>
+    <property id="BatteryWarningLimitCritical" type="number">10</property>
     <property id="BatteryBackgroundColor" type="number">0x123456</property>
     <property id="DemoMode" type="boolean">false</property>
 
