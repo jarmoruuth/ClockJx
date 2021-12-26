@@ -1,6 +1,6 @@
 <properties>
 
-	<property id="appVersion" type="string">1.2.0</property>
+	<property id="appVersion" type="string">1.2.1</property>
     <property id="BackgroundColor" type="number">0x000000</property>
     <property id="ForegroundColor" type="number">0xFFFFFF</property>
     <property id="BackgroundImage" type="number">0</property>  
@@ -8,6 +8,7 @@
     <property id="Use24hFormat" type="boolean">true</property>
     <property id="MountainMode" type="boolean">false</property>
     <property id="Steps" type="boolean">false</property>
+    <property id="HeartRate" type="boolean">false</property>
     <property id="UseBackgroundColorWithImage" type="boolean">true</property>
     <property id="UseSystemFont" type="boolean">false</property>
     <property id="UseDualTime" type="boolean">false</property>

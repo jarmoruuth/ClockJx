@@ -10,6 +10,7 @@
     <string id="MountainModeTitle">Altitude</string>    
     <string id="DigitalClockTitle">Digital clock</string>
     <string id="StepsTitle">Steps</string>
+    <string id="HeartRateTitle">Heart rate</string>
     <string id="UseBackgroundColorWithImageTitle">Background color with image</string>
     <string id="UseSystemFontTitle">Use system font with digital clock</string>
     <string id="UseBluetoothIconTitle">Show bluetooth connection status</string>

@@ -20,6 +20,9 @@ using Toybox.ActivityMonitor as ActMonitor;
 //		Custom fonts: https://forums.garmin.com/showthread.php?338498-Using-Custom-Fonts
 //		Many others I cannot find any more
 //	- Some other sources I cannot remember any more
+//  - I could not get icon fonts working but borrowed two icons as bitmap from
+//    icon fonts created by Franco Trimboli
+//      https://github.com/sunpazed/garmin-iconfonts
 //
 // This is updated from original Fenix 3 version. I now have Vivoactive 4.
 //
@@ -60,16 +63,19 @@ class ClockJxView extends Ui.WatchFace {
 	var fgcolor;
 	var bgcolor;
 	var hash_color;
-	var font;
+	var analog_number_font;
 	var battery_limit_low = 25;
 	var battery_limit_critical = 10;
 	var battery_background_color = 0x000000;
 	var background;
 	var image_num = 0;
-	var mountain_mode = false;
+	var altitude_mode = false;
 	var AnalogUse24hFormat = true;
 	var digital_clock = true;
 	var steps = false;
+	var steps_image = null;
+	var heart_rate = false;
+	var heart_rate_image = null;
 	var screen_shape;
 	var bgcolor_with_image;
 	var use_bgcolor_with_image = true;
@@ -78,8 +84,8 @@ class ClockJxView extends Ui.WatchFace {
 	var dualtime = false;
 	var dualtimeTZ = 0;
 	var dualtimeDST = -1;	// current DST
-	var bluetooth_ok_image;
-	var bluetooth_error_image;
+	var bluetooth_ok_image = null;
+	var bluetooth_error_image = null;
 	var bluetooth_status = true;
 	var show_bluetooth_status = true;
 	var use_large_dualtime_font = false;
@@ -129,8 +135,9 @@ class ClockJxView extends Ui.WatchFace {
 		
 		digital_clock = checkBool(App.getApp().getProperty("DigitalClock"), digital_clock);
 		AnalogUse24hFormat = checkBool(App.getApp().getProperty("AnalogUse24hFormat"), AnalogUse24hFormat);
-		mountain_mode = checkBool(App.getApp().getProperty("MountainMode"), mountain_mode);
+		altitude_mode = checkBool(App.getApp().getProperty("MountainMode"), altitude_mode);
 		steps = checkBool(App.getApp().getProperty("Steps"), steps);
+		heart_rate = checkBool(App.getApp().getProperty("HeartRate"), heart_rate);
 		dualtime = checkBool(App.getApp().getProperty("UseDualTime"), dualtime);
 		dualtimeTZ = checkNumber(App.getApp().getProperty("DualTimeTZ"), dualtimeTZ);
 		dualtimeDST = checkNumber(App.getApp().getProperty("DualTimeDST"), dualtimeDST);
@@ -192,16 +199,15 @@ class ClockJxView extends Ui.WatchFace {
 	    	if (demo) {
 	    		bluetooth_status = !bluetooth_status;
 	    	}
-	    	if (bluetooth_ok_image == null) {
-	    		bluetooth_ok_image = Ui.loadResource(Rez.Drawables.bluetooth_ok);
-	    	}
-	    	if (bluetooth_error_image == null) {
-    			bluetooth_error_image = Ui.loadResource(Rez.Drawables.bluetooth_error);
-    		}
-	    } else {
-	    	bluetooth_ok_image = null;
-	    	bluetooth_error_image = null;
+			bluetooth_ok_image = Ui.loadResource(Rez.Drawables.bluetooth_ok);
+			bluetooth_error_image = Ui.loadResource(Rez.Drawables.bluetooth_error);
 	    }
+		if (steps) {
+			steps_image = Ui.loadResource(Rez.Drawables.steps);
+		}
+		if (heart_rate) {
+			heart_rate_image = Ui.loadResource(Rez.Drawables.bpm);
+		}
 	    use_large_dualtime_font = checkBool(App.getApp().getProperty("UseLargeDualTimeFont"), use_large_dualtime_font);
 	    battery_limit_low = checkNumber(App.getApp().getProperty("BatteryWarningLimitLow"), battery_limit_low);
 	    battery_limit_critical = checkNumber(App.getApp().getProperty("BatteryWarningLimitCritical"), battery_limit_critical);
@@ -331,8 +337,7 @@ class ClockJxView extends Ui.WatchFace {
         var clockTime = Sys.getClockTime();
         var hour;
         var min;
-        var dim;
-        var digital_dim;
+        var tiny_font_height;
         var dateStr;
         var center;
         var analog_num_dim = null;
@@ -340,10 +345,10 @@ class ClockJxView extends Ui.WatchFace {
 		var base_ampm;
 		var base_altitude;
 		var base_battery;
-		var base_steps;
+		var base_steps_hr;
 		var base_dualtime;
 		var pos_dualtime;
-		var justify_dualtime;
+		var text_justify_dualtime;
 		var bluetooth_x;
 		var bluetooth_y;
 		var dualtime_font = Gfx.FONT_TINY;
@@ -381,12 +386,12 @@ class ClockJxView extends Ui.WatchFace {
         if (!digital_clock) { 
 	        // Draw the numbers
 			if (screen_shape == Sys.SCREEN_SHAPE_ROUND) {
-				font = Gfx.FONT_NUMBER_MILD;
+				analog_number_font = Gfx.FONT_NUMBER_MILD;
 			} else {
-				font = Gfx.FONT_SMALL;
+				analog_number_font = Gfx.FONT_SMALL;
 			}
-			analog_num_dim = dc.getFontHeight(font);
-			dim = analog_num_dim;
+			analog_num_dim = dc.getFontHeight(analog_number_font);
+			tiny_font_height = analog_num_dim;
 			hour = now_hour;
 			if (hour >= 12 && AnalogUse24hFormat) {
 				analog_24h = true;
@@ -395,38 +400,37 @@ class ClockJxView extends Ui.WatchFace {
 				} else {
 					dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
 				}
-	        	dc.drawText((width/2),0,font,"24",Gfx.TEXT_JUSTIFY_CENTER);
+	        	dc.drawText((width/2),0,analog_number_font,"24",Gfx.TEXT_JUSTIFY_CENTER);
 	        	// if (Battery >= battery_limit2) {
 	        	//	dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
 	        	//}
-	        	//dc.drawText(width-5,height/2-15,font,"15", Gfx.TEXT_JUSTIFY_RIGHT);
-	        	dc.drawText(width/2,height-dim,font,"18", Gfx.TEXT_JUSTIFY_CENTER);
-	        	dc.drawText(width/2-height/2+4,(height/2)-(dim/2)-4,font,"21",Gfx.TEXT_JUSTIFY_LEFT);
+	        	//dc.drawText(width-5,height/2-15,analog_number_font,"15", Gfx.TEXT_JUSTIFY_RIGHT);
+	        	dc.drawText(width/2,height-tiny_font_height,analog_number_font,"18", Gfx.TEXT_JUSTIFY_CENTER);
+	        	dc.drawText(width/2-height/2+4,(height/2)-(tiny_font_height/2)-4,analog_number_font,"21",Gfx.TEXT_JUSTIFY_LEFT);
 	        } else {
 	        	if (Battery >= battery_limit_critical) {
 					dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
 				} else {
 					dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
 				}
-	        	dc.drawText((width/2),0,font,"12",Gfx.TEXT_JUSTIFY_CENTER);
+	        	dc.drawText((width/2),0,analog_number_font,"12",Gfx.TEXT_JUSTIFY_CENTER);
 	        	if (Battery >= battery_limit_critical) {
 	        		dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
 	        	}
-	        	//dc.drawText(width-5,height/2-15,font,"3", Gfx.TEXT_JUSTIFY_RIGHT);
-	        	//dc.drawText(width/2,height-35,font,"6", Gfx.TEXT_JUSTIFY_CENTER);
-	        	dc.drawText(width/2,height-dim,font,"6", Gfx.TEXT_JUSTIFY_CENTER);
-				dim = dc.getFontHeight(font);        	
-	        	dc.drawText(width/2-height/2+4,(height/2)-(dim/2)-4,font,"9",Gfx.TEXT_JUSTIFY_LEFT);
+	        	//dc.drawText(width-5,height/2-15,analog_number_font,"3", Gfx.TEXT_JUSTIFY_RIGHT);
+	        	//dc.drawText(width/2,height-35,analog_number_font,"6", Gfx.TEXT_JUSTIFY_CENTER);
+	        	dc.drawText(width/2,height-tiny_font_height,analog_number_font,"6", Gfx.TEXT_JUSTIFY_CENTER);
+				tiny_font_height = dc.getFontHeight(analog_number_font);        	
+	        	dc.drawText(width/2-height/2+4,(height/2)-(tiny_font_height/2)-4,analog_number_font,"9",Gfx.TEXT_JUSTIFY_LEFT);
 	        }
 	 	}
 
 		// fonts and dimensions
-	    digital_dim = dc.getFontHeight(digital_clock_font);
-	    dim = dc.getFontHeight(Gfx.FONT_TINY);	   
+	    tiny_font_height = dc.getFontHeight(Gfx.FONT_TINY);
     	center = height/2;
 
 		pos_dualtime = width / 2;
-		justify_dualtime = Gfx.TEXT_JUSTIFY_CENTER;
+		text_justify_dualtime = Gfx.TEXT_JUSTIFY_CENTER;
 		
 		var fix = 0;
 		
@@ -438,54 +442,63 @@ class ClockJxView extends Ui.WatchFace {
 			// Round clock
 			if (digital_clock) {
 				//	digital clock
-				// 		altitude*
+				// 		altitude* -> dualtime*
 				//		date
 				//		TIME
-				// 		dualtime*
-				//		steps*
+				// 		dualtime* -> altitude*
+				//		steps* heart_rate*
 				//		battery
 				var extra_fix = 3;
-				if (!mountain_mode) {
-					fix = dim/2;
+				// if (!altitude_mode) {
+				if (!dualtime) {
+					fix = tiny_font_height/2;
 				}
-				base_altitude = dim + 1;
-				base_date = 2 * dim + 2 - fix;
+				// base_altitude = tiny_font_height + 1;
+				base_dualtime = tiny_font_height + 1;
+				base_date = 2 * tiny_font_height + 2 - fix;
 				// TIME
 				fix = 0;			
-				if (!dualtime || !steps) {
-					fix = dim/2;
+				// if (!dualtime || !(steps || heart_rate)) {
+				if (!altitude_mode || !(steps || heart_rate)) {
+					fix = tiny_font_height/2;
 				}
-				base_dualtime = height - 3 * dim - 3 + fix - extra_fix;				
-				base_steps = height - 2 * dim - 2 - fix - extra_fix;
-				base_battery = height - dim - 1 - fix - extra_fix;
+				// base_dualtime = height - 3 * tiny_font_height - 3 + fix - extra_fix;
+				base_altitude = height - 3 * tiny_font_height - 3 + fix - extra_fix;
+				base_steps_hr = height - 2 * tiny_font_height - 2 - fix - extra_fix;
+				base_battery = height - tiny_font_height - 1 - fix - extra_fix;
 				//bluetooth_x = 32;
 				//bluetooth_y = base_date  + 2;
 				bluetooth_x = width / 2 - 8;
 				bluetooth_y = 1;
-				base_ampm = center + dim/2;
+				base_ampm = center + tiny_font_height/2;
 			} else {
 				//	analog clock
 				// 		dualtime*
 				//		altitude*
 				//	bt	CENTER		date
-				//		steps*
+				//		steps* heart_rate*
 				//		battery
-				if (!dualtime || !mountain_mode) {
-					fix = dim/2;
+				var analog_number_font_height = dc.getFontHeight(analog_number_font);
+				if (!dualtime || !altitude_mode) {
+					fix = tiny_font_height/2;
 				}
-				if (!mountain_mode && use_large_dualtime_font) {
+				if (!altitude_mode && use_large_dualtime_font) {
 					dualtime_font = Gfx.FONT_MEDIUM;
 				}
-				base_dualtime = dim/2 + dim + 1 + fix;
-				base_altitude = dim/2 + 2 * dim + 2 - fix;
+				// base_dualtime = tiny_font_height/2 + tiny_font_height + 1 + fix;
+				// base_altitude = tiny_font_height/2 + 2 * tiny_font_height + 2 - fix;
+				base_dualtime = analog_number_font_height + 2 + fix;
+				base_altitude = analog_number_font_height + 2 + tiny_font_height - fix;
 				// CENTER
-				base_date = center + dim/2;
+				base_date = center + tiny_font_height/2;
 				fix = 0;
-				if (!steps) {
-					fix = dim/2;
+				if (!(steps || heart_rate)) {
+					fix = tiny_font_height/2;
 				}				
-				base_steps = height - dim/2 - 3 * dim - 3;
-				base_battery = height - dim/2 - 2 * dim - 2 - fix;
+				// base_steps_hr = height - tiny_font_height/2 - 3 * tiny_font_height - 3;
+				// base_battery = height - tiny_font_height/2 - 2 * tiny_font_height - 2 - fix;
+				base_steps_hr = height - analog_number_font_height - 2 - 2 * tiny_font_height;
+				base_battery = height - analog_number_font_height - 2 - tiny_font_height - fix;
 				bluetooth_x = 2 * 16;
 				if (analog_24h) {
 					bluetooth_x  = bluetooth_x + 16;
@@ -501,47 +514,47 @@ class ClockJxView extends Ui.WatchFace {
 				// 	bt	altitude*
 				//		date
 				//		TIME
-				//		steps*
+				//		steps* heart_rate*
 				//	dt*	battery
-				if (!mountain_mode) {
-					fix = dim/2;
+				if (!altitude_mode) {
+					fix = tiny_font_height/2;
 				}
 				base_altitude = 1;
-				base_date = dim + 2 - fix;
+				base_date = tiny_font_height + 2 - fix;
 				// TIME
 				fix = 0;
-				if (!steps && !dualtime) {
-					fix = dim/2;
+				if (!(steps || heart_rate) && !dualtime) {
+					fix = tiny_font_height/2;
 				}
-				base_steps = height - 2 * dim - 2;
-				base_battery = height - dim - 1 - fix;				
-				base_dualtime = height - dim - 1;	// lower left corner
+				base_steps_hr = height - 2 * tiny_font_height - 2;
+				base_battery = height - tiny_font_height - 1 - fix;				
+				base_dualtime = height - tiny_font_height - 1;	// lower left corner
 				pos_dualtime = 1;		
-				justify_dualtime = Gfx.TEXT_JUSTIFY_LEFT;	
-				base_ampm = center + dim/2;	
+				text_justify_dualtime = Gfx.TEXT_JUSTIFY_LEFT;	
+				base_ampm = center + tiny_font_height/2;	
 			} else {
 				//	analog clock
 				// 	bt	dualtime*
 				//		altitude*
 				//		CENTER		date
-				//		steps*
+				//		steps* heart_rate
 				//		battery
-				if (!dualtime || !mountain_mode) {
-					fix = dim/2;
+				if (!dualtime || !altitude_mode) {
+					fix = tiny_font_height/2;
 				}
-				if (!mountain_mode && use_large_dualtime_font) {
+				if (!altitude_mode && use_large_dualtime_font) {
 					dualtime_font = Gfx.FONT_SMALL;
 				}
-				base_dualtime = dim + 1 + fix;
-				base_altitude = 2 * dim + 2 - fix;
+				base_dualtime = tiny_font_height + 1 + fix;
+				base_altitude = 2 * tiny_font_height + 2 - fix;
 				// CENTER
 				fix = 0;
-				base_date = center + dim/2;
-				if (!steps) {
-					fix = dim/2;
+				base_date = center + tiny_font_height/2;
+				if (!(steps || heart_rate)) {
+					fix = tiny_font_height/2;
 				}
-				base_steps = height - 3 * dim - 3;
-				base_battery = height - 2 * dim - 2 - fix;
+				base_steps_hr = height - 3 * tiny_font_height - 3;
+				base_battery = height - 2 * tiny_font_height - 2 - fix;
 				base_ampm = 0;
 			}
 			bluetooth_x = 0;
@@ -561,7 +574,7 @@ class ClockJxView extends Ui.WatchFace {
 		}
 		
     	// Draw Altitude
-		if (mountain_mode) {		
+		if (altitude_mode) {		
 			var actInfo;
 			var altitudeStr;
 			var highaltide = false;			
@@ -585,9 +598,9 @@ class ClockJxView extends Ui.WatchFace {
 				actaltitude = 2238;			// DEMO
 			}				
 			if (unknownaltitude) {
-				altitudeStr = Lang.format(" Alt unknown");
+				altitudeStr = "Alt -";
 			} else {
-				altitudeStr = Lang.format(" Alt $1$", [actaltitude.toLong()]);
+				altitudeStr = "Alt " + actaltitude.toString();
 			}
 			if (metric) {
 				altitudeStr = altitudeStr + " m ";
@@ -630,7 +643,7 @@ class ClockJxView extends Ui.WatchFace {
         if (digital_clock) {
         	dc.drawText(width/2,base_date,Gfx.FONT_TINY, dateStr, Gfx.TEXT_JUSTIFY_CENTER);
         } else {
-	        dc.drawText(width - 4, (height/2)-(dim/2), Gfx.FONT_TINY, dateStr, Gfx.TEXT_JUSTIFY_RIGHT);
+	        dc.drawText(width - 4, (height/2)-(tiny_font_height/2), Gfx.FONT_TINY, dateStr, Gfx.TEXT_JUSTIFY_RIGHT);
 	  	}
 	  	
 		// Draw dual time
@@ -704,32 +717,69 @@ class ClockJxView extends Ui.WatchFace {
 					dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
 				}
 			}
-        	dc.drawText(pos_dualtime,base_dualtime,dualtime_font, timeStr, justify_dualtime);        
+        	dc.drawText(pos_dualtime,base_dualtime,dualtime_font, timeStr, text_justify_dualtime);        
 		} 
 
-		// Draw Steps        
-        if (steps) {
+		// Draw Steps and/or heart rate on the same line
+        if (steps || heart_rate) {
 
 			var actInfo;
-			var actsteps = 0;
-			var unknownsteps = true;	
-			var stepsStr;
+			var hrSample;
+			var act_steps = 0;
+			var unknown_steps = true;	
+			var steps_txt;
+			var cur_hr = 0;
+			var unknown_hr = true;	
+			var hr_txt;
+			var step_hr_font = Gfx.FONT_TINY;
+			var steps_txt_width = 0;
+			var hr_txt_width = 0;
+			var steps_image_width = 0;
+			var hr_image_width = 0;
 			
-			actInfo = ActMonitor.getInfo();
-			if (actInfo != null) {
-				actsteps = actInfo.steps;
-				if (actsteps != null) {
-					unknownsteps = false;
+			if (steps) {
+				actInfo = ActMonitor.getInfo();
+				if (actInfo != null) {
+					act_steps = actInfo.steps;
+					if (act_steps != null) {
+						unknown_steps = false;
+					}
 				}
-			}
-			if (demo) {
-				unknownsteps = false; 	//DEMO
-				actsteps = 2968;		// DEMO
-			}
-			if (unknownsteps) {
-				stepsStr = Lang.format(" unknown steps ", [actsteps]);
+				if (demo) {
+					unknown_steps = false; 	//DEMO
+					act_steps = 2968;		// DEMO
+				}
+				if (unknown_steps) {
+					steps_txt = "-";
+				} else {
+					steps_txt = act_steps.toString();
+				}
+				steps_txt_width = dc.getTextWidthInPixels(steps_txt, step_hr_font);
+				steps_image_width = steps_image.getWidth();
 			} else {
-				stepsStr = Lang.format(" $1$ steps ", [actsteps]);			
+				steps_txt = "";
+			}
+			if (heart_rate) {
+				hrSample = ActMonitor.HeartRateSample;
+				if (hrSample != null) {
+					cur_hr = hrSample.heartRate;
+					if (cur_hr != null) {
+						unknown_hr = false;
+					}
+				}
+				if (demo) {
+					unknown_hr = false; 		//DEMO
+					cur_hr = 87;				// DEMO
+				}
+				if (unknown_hr) {
+					hr_txt = "-";
+				} else {
+					hr_txt = cur_hr.toString();
+				}
+				hr_txt_width = dc.getTextWidthInPixels(hr_txt, step_hr_font);
+				hr_image_width = heart_rate_image.getWidth();
+			} else {
+				hr_txt = "";
 			}
 
 			if (Battery < battery_limit_critical) {
@@ -741,7 +791,34 @@ class ClockJxView extends Ui.WatchFace {
 					dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
 				}
 			}
-			dc.drawText(width/2,base_steps,Gfx.FONT_TINY, stepsStr, Gfx.TEXT_JUSTIFY_CENTER);
+			var pos;
+			var spacing = 4;
+			if (steps && heart_rate) {
+				pos = width/2 - (hr_image_width + hr_txt_width + steps_image_width + steps_txt_width + 4 * spacing) / 2;
+
+				dc.drawBitmap(pos, base_steps_hr + steps_image.getHeight() / 2 , heart_rate_image);
+				pos = pos + hr_image_width + spacing;
+				dc.drawText(pos, base_steps_hr, Gfx.FONT_TINY, hr_txt, Gfx.TEXT_JUSTIFY_LEFT);
+				pos = pos + hr_txt_width + spacing;
+
+				pos = pos + spacing;	// extra spaceing in the middle
+
+				dc.drawBitmap(pos, base_steps_hr + steps_image.getHeight() / 2, steps_image);
+				pos = pos + steps_image_width + spacing;
+				dc.drawText(pos, base_steps_hr, Gfx.FONT_TINY, steps_txt, Gfx.TEXT_JUSTIFY_LEFT);
+
+			} else if (steps) {
+				pos = width/2 - (steps_image_width + steps_txt_width + spacing) / 2;
+				dc.drawBitmap(pos, base_steps_hr + steps_image.getHeight() / 2, steps_image);
+				pos = pos + steps_image_width + spacing;
+				dc.drawText(pos, base_steps_hr, Gfx.FONT_TINY, steps_txt, Gfx.TEXT_JUSTIFY_LEFT);
+
+			} else if (heart_rate) {
+				pos = width/2 - (hr_image_width + hr_txt_width + spacing) / 2;
+				dc.drawBitmap(pos, base_steps_hr + heart_rate_image.getHeight() / 2, heart_rate_image);
+				pos = pos + hr_image_width + spacing;
+				dc.drawText(pos, base_steps_hr, Gfx.FONT_TINY, hr_txt, Gfx.TEXT_JUSTIFY_LEFT);
+			}
         }
 
         // Draw battery
@@ -807,7 +884,7 @@ class ClockJxView extends Ui.WatchFace {
          		dc.drawText(textx, texty, digital_clock_font, timeStr, Gfx.TEXT_JUSTIFY_LEFT);
          	}
          	if (!use24hclock) {
-         		dc.drawText(width - 4,(height/2)-(dim/2),Gfx.FONT_TINY, ampmStr, Gfx.TEXT_JUSTIFY_RIGHT);
+         		dc.drawText(width - 4,(height/2)-(tiny_font_height/2),Gfx.FONT_TINY, ampmStr, Gfx.TEXT_JUSTIFY_RIGHT);
          	}
         } else {
         	var hour_hand_length;

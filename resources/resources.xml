@@ -10,9 +10,12 @@
        
     <bitmap id="bluetooth_ok" filename="images/Bluetooth-ok.png" />
     <bitmap id="bluetooth_error" filename="images/Bluetooth-error.png" />
-    
+
+    <bitmap id="steps" filename="images/steps-white-16.png" />
+    <bitmap id="bpm" filename="images/heart-white-16.png" />
+
     <fonts>
 		<font id="timefont" filename="fonts/impact.fnt" filter="0123456789:"/>
-	</fonts>    
+	  </fonts>    
 
 </resources>

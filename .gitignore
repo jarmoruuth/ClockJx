@@ -1,6 +1,7 @@
 bin/
 device/
 export/
+misc/
 
 *.bat
 *.bak

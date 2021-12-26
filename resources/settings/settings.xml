@@ -120,6 +120,10 @@
         <settingConfig type="boolean" />
     </setting>
 
+   	<setting propertyKey="@Properties.HeartRate" title="@Strings.HeartRateTitle">
+        <settingConfig type="boolean" />
+    </setting>
+
    	<setting propertyKey="@Properties.UseBackgroundColorWithImage" title="@Strings.UseBackgroundColorWithImageTitle">
         <settingConfig type="boolean" />
     </setting>
