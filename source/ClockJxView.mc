@@ -8,6 +8,10 @@ using Toybox.Time.Gregorian as Calendar;
 using Toybox.Activity as Act;
 using Toybox.ActivityMonitor as ActMonitor;
 
+// ----------------------------------------------------------------
+// Credits
+// ----------------------------------------------------------------
+//
 // I have used the following sources for the development of this watch face:
 //	- Garmid SDK samples
 // 	- Very nice blog post from Aaron Boman 
@@ -16,9 +20,18 @@ using Toybox.ActivityMonitor as ActMonitor;
 //		Custom fonts: https://forums.garmin.com/showthread.php?338498-Using-Custom-Fonts
 //		Many others I cannot find any more
 //	- Some other sources I cannot remember any more
-// This updated from original Fenix 3 version
 //
+// This is updated from original Fenix 3 version. I now have Vivoactive 4.
+//
+// ----------------------------------------------------------------
+// How to build and other info:
+// ----------------------------------------------------------------
+//
+// https://developer.garmin.com/connect-iq/connect-iq-basics/getting-started/
+//
+// ----------------------------------------------------------------
 // Misc notes
+// ----------------------------------------------------------------
 //
 // fonts
 // -----
@@ -788,7 +801,7 @@ class ClockJxView extends Ui.WatchFace {
          		dc.drawText(textx, texty, digital_clock_font, timeStr, Gfx.TEXT_JUSTIFY_LEFT);
          	
          		dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
-         		dc.drawText(textx-2,texty-2, digital_clock_font, timeStr, Gfx.TEXT_JUSTIFY_LEFT);
+         		dc.drawText(textx-4,texty-4, digital_clock_font, timeStr, Gfx.TEXT_JUSTIFY_LEFT);
          	} else {
          		dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
          		dc.drawText(textx, texty, digital_clock_font, timeStr, Gfx.TEXT_JUSTIFY_LEFT);

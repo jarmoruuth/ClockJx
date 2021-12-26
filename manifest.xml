@@ -4,8 +4,10 @@
     <!--
         Use "Monkey C: Edit Application" from the Visual Studio Code command palette
         to update the application attributes.
+        old id="5455313B150A4A7F8A07A82B2EEFA76A"
+        new id="d3e3e8da-a9db-416c-9be1-d36f58a8b3b2"
     -->
-    <iq:application id="d3e3e8da-a9db-416c-9be1-d36f58a8b3b2" type="watchface" name="@Strings.AppName" entry="ClockJxApp" launcherIcon="@Drawables.LauncherIcon" minApiLevel="3.2.0">
+    <iq:application id="5455313B150A4A7F8A07A82B2EEFA76A" type="watchface" name="@Strings.AppName" entry="ClockJxApp" launcherIcon="@Drawables.LauncherIcon" minApiLevel="3.2.0">
         <!--
             Use the following from the Visual Studio Code comand palette to edit
             the build targets:
@@ -19,13 +21,11 @@
             <iq:product id="fenix5xplus"/>
             <iq:product id="fenix6"/>
             <iq:product id="fenix6pro"/>
-            <iq:product id="fenix6prosystem5preview"/>
             <iq:product id="fenix6s"/>
             <iq:product id="fenix6spro"/>
             <iq:product id="fenix6xpro"/>
             <iq:product id="venu"/>
             <iq:product id="venu2"/>
-            <iq:product id="venu2system5preview"/>
             <iq:product id="venu2s"/>
             <iq:product id="venud"/>
             <iq:product id="venusq"/>
