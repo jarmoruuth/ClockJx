@@ -1,34 +1,38 @@
 # ClockJx
-ClockJx is a configurable watch face that has both digital and analog clocks. Both foreground and background colors can be changed. There is also an option to use a skiing and mountain themed image in the background.
+ClockJx is a configurable watch face that has both digital and analog clocks. Different colors and settings on the display can be changed. There is also an option to use a skiing and mountain themed image in the background.
 
-It is possible to show one or all of the following information on the clock face:
+Always visible on the clock screen are:
 
+- Current time in either analog or digital format.
+- Current day and date.
+- Battery status in percentages.
+
+Optionally it is possible to show one or all of the following information on the clock face:
+
+- Bluetooth connection status
+- Current heart beat
 - Daily step count
 - Current altitude
 - Dual time in digital format
 
-Other configuration options are:
+Configuration options are:
 
 - Analog or digital clock
+- Digital time color
 - Background color
 - Foreground color
 - Background image
 - ClockJx default font or system font for digital time display
 - Bluetooth status display
-- Dual time daylight savings time offset
+- Dual time and dual time daylight savings time offset
 - Bigger dual time font size with analog clock when altitude is not displayed
 - Low and critical battery warning levels
 - Battery status background color.
 - Analog 24 hour clock.
+- Step count
+- Current heart beat
 
-Always visible on the clock screen are:
-
-- Current time in either analog or digital format.
-- Battery status in percentages.
-- Current day and date.
-- Bluetooth connection status
-
-Normally battery status is show with a green color. If battery goes below low battery warning level (default 25%) it is shown in orange color. If battery goes below critical battery warning level (default 25%) most other elements like analog watch face numbers and altitude and step count turn to red. The idea is that you should not miss a low battery status before going on a training.
+Normally battery status is show with a green color. If battery goes below low battery warning level (default 25%) it is shown in orange color. If battery goes below critical battery warning level (default 10%) most other elements like analog watch face numbers and altitude and step count turn to red. The idea is that you should not miss a low battery status before going on a training.
 
 If Bluetooth status is shown then an active connection is shown with a blue Bluetooth icon. If connection is not active it is shown with a red Bluetooth icon.
 
@@ -36,13 +40,16 @@ Photos Copyright (C) 1996-2015 Jarmo Ruuth and Jari Arkko
 
 CONFIGURATION
 
-Configuration works from a mobile phone or from Garmin express. You cannot configure directly from a Garmin device like you can do with a built in watch face. In the mobile phone you need to go to watch face section and select the installed ClockJx watch face. Then you can select settings and change them there.
+Configuration works from a mobile phone. You cannot configure directly from a Garmin device. In the mobile phone you need to go to watch face section and select the installed ClockJx watch face. Then you can select settings and change them there.
 
 FEEDBACK
 
 For comments, questions, ideas and problems you can send email to clockjx@gmail.com.
 
-Version history;
+Version history:
+
+1.2.1 Added heart rate display, digital time color
+1.2.0 Updated to latest Garmin SDK and new devices (Dec 2021)
 
 1.0.5 First version where configuration works with a real device. Includes background images.
 1.0.7 New optional analog time font, more color options, new background images.
@@ -54,4 +61,4 @@ Version history;
 1.1.4 Added configurable dual time daylight savings time offset, fixed problems in am/pm shown incorrectly.
 1.1.5 Added configurable low and critical battery warning levels.
 1.1.6 Added configurable battery status background color.
-1.2.0 Updated to latest Garmin SDK and new devices (Dec 2021)
+

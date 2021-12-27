@@ -61,6 +61,7 @@ class ClockJxView extends Ui.WatchFace {
 
 	var settingsChanged = true;
 	var fgcolor;
+	var digital_time_color;
 	var bgcolor;
 	var hash_color;
 	var analog_number_font;
@@ -180,6 +181,7 @@ class ClockJxView extends Ui.WatchFace {
         	}			
     	}
     	image_num = new_image_num;
+       	digital_time_color = checkColor(App.getApp().getProperty("TimeColor"), Gfx.COLOR_WHITE);
        	fgcolor = checkColor(App.getApp().getProperty("ForegroundColor"), Gfx.COLOR_WHITE);
        	bgcolor = checkColor(App.getApp().getProperty("BackgroundColor"), Gfx.COLOR_BLACK);
     	if (fgcolor == Gfx.COLOR_WHITE && bgcolor == Gfx.COLOR_BLACK && image_num == 0) {
@@ -598,9 +600,9 @@ class ClockJxView extends Ui.WatchFace {
 				actaltitude = 2238;			// DEMO
 			}				
 			if (unknownaltitude) {
-				altitudeStr = "Alt -";
+				altitudeStr = " Alt -";
 			} else {
-				altitudeStr = "Alt " + actaltitude.toString();
+				altitudeStr = " Alt " + actaltitude.toString();
 			}
 			if (metric) {
 				altitudeStr = altitudeStr + " m ";
@@ -750,9 +752,9 @@ class ClockJxView extends Ui.WatchFace {
 					act_steps = 2968;		// DEMO
 				}
 				if (unknown_steps) {
-					steps_txt = "-";
+					steps_txt = " - ";
 				} else {
-					steps_txt = act_steps.toString();
+					steps_txt = " " + act_steps.toString() + " ";
 				}
 				steps_txt_width = dc.getTextWidthInPixels(steps_txt, step_hr_font);
 				steps_image_width = steps_image.getWidth();
@@ -772,9 +774,9 @@ class ClockJxView extends Ui.WatchFace {
 					cur_hr = 87;				// DEMO
 				}
 				if (unknown_hr) {
-					hr_txt = "-";
+					hr_txt = " - ";
 				} else {
-					hr_txt = cur_hr.toString();
+					hr_txt = " " + cur_hr.toString() + " ";
 				}
 				hr_txt_width = dc.getTextWidthInPixels(hr_txt, step_hr_font);
 				hr_image_width = heart_rate_image.getWidth();
@@ -792,7 +794,7 @@ class ClockJxView extends Ui.WatchFace {
 				}
 			}
 			var pos;
-			var spacing = 4;
+			var spacing = 2;
 			if (steps && heart_rate) {
 				pos = width/2 - (hr_image_width + hr_txt_width + steps_image_width + steps_txt_width + 4 * spacing) / 2;
 
@@ -801,7 +803,7 @@ class ClockJxView extends Ui.WatchFace {
 				dc.drawText(pos, base_steps_hr, Gfx.FONT_TINY, hr_txt, Gfx.TEXT_JUSTIFY_LEFT);
 				pos = pos + hr_txt_width + spacing;
 
-				pos = pos + spacing;	// extra spaceing in the middle
+				pos = pos + spacing;	// extra spacing in the middle
 
 				dc.drawBitmap(pos, base_steps_hr + steps_image.getHeight() / 2, steps_image);
 				pos = pos + steps_image_width + spacing;
@@ -877,10 +879,10 @@ class ClockJxView extends Ui.WatchFace {
          		dc.setColor(bgcolor, Gfx.COLOR_TRANSPARENT);
          		dc.drawText(textx, texty, digital_clock_font, timeStr, Gfx.TEXT_JUSTIFY_LEFT);
          	
-         		dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
+         		dc.setColor(digital_time_color, Gfx.COLOR_TRANSPARENT);
          		dc.drawText(textx-4,texty-4, digital_clock_font, timeStr, Gfx.TEXT_JUSTIFY_LEFT);
          	} else {
-         		dc.setColor(fgcolor, Gfx.COLOR_TRANSPARENT);
+         		dc.setColor(digital_time_color, Gfx.COLOR_TRANSPARENT);
          		dc.drawText(textx, texty, digital_clock_font, timeStr, Gfx.TEXT_JUSTIFY_LEFT);
          	}
          	if (!use24hclock) {

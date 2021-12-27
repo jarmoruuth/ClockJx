@@ -3,6 +3,7 @@
     <string id="AppName">ClockJx</string>
     <string id="AppVersionTitle">Version</string>
 
+    <string id="TimeColorTitle">Digital Time Color</string>
     <string id="BackgroundColorTitle">Background Color</string>
     <string id="ForegroundColorTitle">Foreground Color</string>
     <string id="BackgroundImageTitle">Background Image</string>    
