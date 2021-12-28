@@ -23,6 +23,9 @@ using Toybox.ActivityMonitor as ActMonitor;
 //  - I could not get icon fonts working but borrowed two icons as bitmap from
 //    icon fonts created by Franco Trimboli
 //      https://github.com/sunpazed/garmin-iconfonts
+//  - Watch face from claudiocandio provided some useful tips for reading heart rate that I could not
+//    find from the docs
+//      https://github.com/claudiocandio/Garmin-WatchCLC
 //
 // This is updated from original Fenix 3 version. I now have Vivoactive 4.
 //
@@ -465,8 +468,8 @@ class ClockJxView extends Ui.WatchFace {
 					fix = tiny_font_height/2;
 				}
 				// base_dualtime = height - 3 * tiny_font_height - 3 + fix - extra_fix;
-				base_altitude = height - 3 * tiny_font_height - 3 + fix - extra_fix;
-				base_steps_hr = height - 2 * tiny_font_height - 2 - fix - extra_fix;
+				base_altitude = height - 3 * tiny_font_height - 5 + fix - extra_fix;
+				base_steps_hr = height - 2 * tiny_font_height - 4 - fix - extra_fix;
 				base_battery = height - tiny_font_height - 1 - fix - extra_fix;
 				//bluetooth_x = 32;
 				//bluetooth_y = base_date  + 2;
@@ -724,14 +727,11 @@ class ClockJxView extends Ui.WatchFace {
 
 		// Draw Steps and/or heart rate on the same line
         if (steps || heart_rate) {
-
 			var actInfo;
 			var hrSample;
 			var act_steps = 0;
-			var unknown_steps = true;	
 			var steps_txt;
-			var cur_hr = 0;
-			var unknown_hr = true;	
+			var cur_hr;
 			var hr_txt;
 			var step_hr_font = Gfx.FONT_TINY;
 			var steps_txt_width = 0;
@@ -743,15 +743,13 @@ class ClockJxView extends Ui.WatchFace {
 				actInfo = ActMonitor.getInfo();
 				if (actInfo != null) {
 					act_steps = actInfo.steps;
-					if (act_steps != null) {
-						unknown_steps = false;
-					}
+				} else {
+					act_steps = null;
 				}
 				if (demo) {
-					unknown_steps = false; 	//DEMO
 					act_steps = 2968;		// DEMO
 				}
-				if (unknown_steps) {
+				if (act_steps == null) {
 					steps_txt = " - ";
 				} else {
 					steps_txt = " " + act_steps.toString() + " ";
@@ -762,18 +760,27 @@ class ClockJxView extends Ui.WatchFace {
 				steps_txt = "";
 			}
 			if (heart_rate) {
-				hrSample = ActMonitor.HeartRateSample;
-				if (hrSample != null) {
-					cur_hr = hrSample.heartRate;
-					if (cur_hr != null) {
-						unknown_hr = false;
+				actInfo = Act.getActivityInfo();
+				if (actInfo != null) {
+					cur_hr = actInfo.currentHeartRate;
+				} else {
+					cur_hr = null;
+				}
+				if (cur_hr == null) {
+					if (ActMonitor has :getHeartRateHistory) {
+						var HRH = ActMonitor.getHeartRateHistory(1, true);
+						if (HRH != null) {
+							var HRS = HRH.next();
+							if (HRS != null && HRS.heartRate != ActMonitor.INVALID_HR_SAMPLE) {
+								cur_hr = HRS.heartRate;
+							}
+						}
 					}
 				}
 				if (demo) {
-					unknown_hr = false; 		//DEMO
-					cur_hr = 87;				// DEMO
+					cur_hr = 187;				// DEMO
 				}
-				if (unknown_hr) {
+				if (cur_hr == null) {
 					hr_txt = " - ";
 				} else {
 					hr_txt = " " + cur_hr.toString() + " ";

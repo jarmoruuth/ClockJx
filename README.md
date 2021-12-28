@@ -40,7 +40,7 @@ Photos Copyright (C) 1996-2015 Jarmo Ruuth and Jari Arkko
 
 CONFIGURATION
 
-Configuration works from a mobile phone. You cannot configure directly from a Garmin device. In the mobile phone you need to go to watch face section and select the installed ClockJx watch face. Then you can select settings and change them there.
+Configuration works from a mobile device. You cannot change configuration directly from a Garmin device.
 
 FEEDBACK
 
@@ -48,8 +48,9 @@ For comments, questions, ideas and problems you can send email to clockjx@gmail.
 
 Version history:
 
+1.2.2 Fix to reading heart rate
 1.2.1 Added heart rate display, digital time color
-1.2.0 Updated to latest Garmin SDK and new devices (Dec 2021)
+1.2.0 Updated to latest Garmin SDK and new devices (Dec 2021, API level 3.2.0)
 
 1.0.5 First version where configuration works with a real device. Includes background images.
 1.0.7 New optional analog time font, more color options, new background images.
