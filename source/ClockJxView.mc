@@ -605,7 +605,7 @@ class ClockJxView extends Ui.WatchFace {
 			if (unknownaltitude) {
 				altitudeStr = " Alt -";
 			} else {
-				altitudeStr = " Alt " + actaltitude.toString();
+				altitudeStr = Lang.format(" Alt $1$", [actaltitude.toLong()]);
 			}
 			if (metric) {
 				altitudeStr = altitudeStr + " m ";

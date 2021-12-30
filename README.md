@@ -48,6 +48,7 @@ For comments, questions, ideas and problems you can send email to clockjx@gmail.
 
 Version history:
 
+1.2.3 Fix to altitude formatting
 1.2.2 Fix to reading heart rate
 1.2.1 Added heart rate display, digital time color
 1.2.0 Updated to latest Garmin SDK and new devices (Dec 2021, API level 3.2.0)
