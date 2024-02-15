@@ -44,7 +44,7 @@ Configuration works from a mobile device. You cannot change configuration direct
 
 FEEDBACK
 
-For comments, questions, ideas and problems you can send email to clockjx@gmail.com.
+For comments, questions, ideas and problems create an issue here in GitHub.
 
 Version history:
 
